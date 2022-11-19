@@ -1,9 +1,14 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {AuthProvider} from './firebase/Auth';
+import Home from './components/Home';
 
 function App() {
   return (
+    <AuthProvider>
+      <Router>
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -20,6 +25,11 @@ function App() {
         </a>
       </header>
     </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
+    </Router>
+    </AuthProvider>
   );
 }
 
