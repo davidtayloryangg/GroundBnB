@@ -1,6 +1,7 @@
 require('dotenv').config();
 const firebase = require('firebase/app');
 const firestore = require('firebase/firestore');
+const cloudStorage = require('firebase/storage');
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_KEY,
@@ -14,5 +15,9 @@ const firebaseConfig = {
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firestore.getFirestore(app);
+const storage = cloudStorage.getStorage(app);
 
-module.exports = db;
+module.exports = {
+  db,
+  storage
+};
