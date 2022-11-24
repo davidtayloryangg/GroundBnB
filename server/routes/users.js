@@ -25,8 +25,7 @@ router.route('/signup').post(async (req, res) => {
   }
 
   try {
-    const newUser = await usersData.createUser(userId,email, firstName, lastName, birthDay, birthMonth, birthYear);
-    console.log(newUser);
+    await usersData.createUser(userId,email, firstName, lastName, birthDay, birthMonth, birthYear);
   } catch (e) {
     return res.status(500).json({ error: e });
   }
