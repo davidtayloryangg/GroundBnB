@@ -13,10 +13,6 @@ const firebaseConfig = {
 };
 
 const app = firebase.initializeApp(firebaseConfig);
-// const db = firebase.firestore();
 const db = firestore.getFirestore(app);
-// const usersCollection = db.collections('users');
-// const bookingsCollection = db.collections('bookings');
-// const listingsCollections = db.collections('listings');
 
 module.exports = db;

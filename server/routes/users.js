@@ -9,13 +9,15 @@ router.route('/login').post(async (req, res) => {
 });
 
 // Creates a new user account
-// request body: userId, email, firstName, lastName, birthDate, (EXTRA profilePicture), 
+// request body: userId, email, firstName, lastName, birthDay, birthMonth, birthYear (EXTRA profilePicture), 
 router.route('/signup').post(async (req, res) => {
   let userId = req.body.userId;
   let email = req.body.email;
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
-  let birthDate = req.body.birthDate;
+  let birthDay = req.body.birthDay;
+  let birthMonth = req.body.birthMonth;
+  let birthYear = req.body.birthYear;
   try {
     // check if request body inputs are valid
   } catch (e) {
@@ -23,7 +25,7 @@ router.route('/signup').post(async (req, res) => {
   }
 
   try {
-    const newUser = await usersData.createUser(userId,email, firstName, lastName, birthDate);
+    const newUser = await usersData.createUser(userId,email, firstName, lastName, birthDay, birthMonth, birthYear);
     console.log(newUser);
   } catch (e) {
     return res.status(500).json({ error: e });
