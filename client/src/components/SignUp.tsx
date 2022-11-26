@@ -36,7 +36,7 @@ function SignUp() {
       <form onSubmit={handleSignUp}>
         <div className='form-group'>
           <label>
-            Name:
+            Name: 
             <input
               className='form-control'
               required
@@ -46,9 +46,10 @@ function SignUp() {
             />
           </label>
         </div>
+        <br/>
         <div className='form-group'>
           <label>
-            Email:
+            Email: 
             <input
               className='form-control'
               required
@@ -58,9 +59,10 @@ function SignUp() {
             />
           </label>
         </div>
+        <br/>
         <div className='form-group'>
           <label>
-            Password:
+            Password: 
             <input
               className='form-control'
               id='passwordOne'
@@ -72,9 +74,10 @@ function SignUp() {
             />
           </label>
         </div>
+        <br/>
         <div className='form-group'>
           <label>
-            Confirm Password:
+            Confirm Password: 
             <input
               className='form-control'
               name='passwordTwo'
@@ -85,6 +88,7 @@ function SignUp() {
             />
           </label>
         </div>
+        <br/>
         <button id='submitButton' name='submitButton' type='submit'>
           Sign Up
         </button>

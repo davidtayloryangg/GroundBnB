@@ -52,6 +52,7 @@ function SignIn() {
             />
           </label>
         </div>
+        <br />
         <div className='form-group'>
           <label>
             Password:
@@ -65,6 +66,7 @@ function SignIn() {
             />
           </label>
         </div>
+        <br />
         <button type='submit'>Log in</button>
 
         <button className='forgotPassword' onClick={passwordReset}>
