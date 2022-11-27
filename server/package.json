@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "nodemon ./dist/server.js",
+    "dev" : "ts-node ./src/server.ts",
+    "build": "tsc",
+    "prod": "npm run build && npm start",
+    "watch": "nodemon --exec ts-node -- ./scr/server.ts"
   },
   "author": "David, Caroline, Matthew, Leena, Ronnie",
   "license": "MIT",
@@ -16,5 +20,11 @@
     "express": "^4.18.2",
     "firebase": "^9.14.0",
     "nodemon": "^2.0.20"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.14",
+    "@types/node": "^18.11.9",
+    "tsc-node": "^0.0.3",
+    "typescript": "^4.9.3"
   }
 }
