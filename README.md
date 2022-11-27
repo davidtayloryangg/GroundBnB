@@ -43,3 +43,18 @@ Customers who have GroundBnB accounts are able to browse backyards to rent while
 * [ImageMagick](https://imagemagick.org/script/index.php)
 
 # <a name="database"></a>Database
+
+
+
+# <a name="todo"></a>Todo's
+- [ ] validations.ts David
+- [ ] routes/listings-(/all) Ronnie
+- [ ] routes/listings-(/search/location) David
+- [ ] routes/listings-(/create) & (edit/:listingId) Leena
+- [ ] routes/listings-(/:listingId') & 
+- [ ] ('/:listingId/review') Matt 
+- [ ] routes/bookings-(/all') & ('/create') Caroline
+- [ ] ('/cancel/:bookingId) Matt
+
+
+
