@@ -8,4 +8,4 @@ export default function Home() {
         {currentUser && <p>Welcome {currentUser.email}</p>}
         </div>
     );
-    }
+}
