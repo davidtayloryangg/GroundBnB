@@ -33,7 +33,13 @@
   padding: 20px;
 }
 
+
 .link {
   text-decoration: none;
   color: black
+ }
+
+.social-signin {
+  width: 200px;
+  height: 50px;
 }

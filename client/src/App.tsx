@@ -4,6 +4,12 @@ import DeckIcon from '@mui/icons-material/Deck';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { AuthProvider } from './firebase/Auth';
 import Home from './components/Home';
+import Account from './components/Account';
+import PrivateRoute from './components/PrivateRoute';
+import Navigation from './components/Navigation';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
+import Landing from './components/Landing';
 
 export default function App() {
   return (
