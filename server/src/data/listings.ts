@@ -6,6 +6,11 @@ const Timestamp = firestore.Timestamp;
 
 export const getAllListings = async () => {
     const querySnapshot = await firestore.getDocs(collection);
-    const listings = querySnapshot.docs.map(doc => doc.data());
+    console.log(querySnapshot);
+    
+    const listings = querySnapshot.docs.map(doc => 
+        console.log(doc.data()));
+        
+        // doc.data());
     return listings;
 }
