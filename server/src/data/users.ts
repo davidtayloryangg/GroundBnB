@@ -1,5 +1,5 @@
 import * as firestore from 'firebase/firestore';
-const db = require('../firestore/config').db;
+const db = require('../firebase/config').db;
 const collection = firestore.collection( db, 'users' );
 //const query = firestore.query(collection, firestore.where('name', '==', 'Bob'));
 const doc = firestore.doc
