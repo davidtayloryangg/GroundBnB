@@ -1,6 +1,6 @@
-import {Users} from "./users"
-export class Routes {
-    public routes(app): void {
-        app.use("/users", Users )
-    }
-}
+import {userRoutes} from "./users"
+import * as express from "express";
+
+export const routes = express.Router();
+
+routes.use("/users", userRoutes);

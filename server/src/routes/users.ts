@@ -1,17 +1,19 @@
 import { Request, Response } from "express";
+import * as express from "express";
+export const userRoutes =express.Router();
 
-export class Users {
-    public routes(app): void {
-        app.route('/')
-            .get((req: Request, res: Response) => {
-                res.status(200).send({
-                    message: 'GET request successfulll!!!!'
-                })
-            })
-            .post((req: Request, res: Response) => {
-                res.status(200).send({
-                    message: 'POST request successfulll!!!!'
-                })
-            })
-    }
-}
+userRoutes.get('/', (req: Request, res: Response) => {
+    console.log("GET /users");
+    
+    res.json({message: 'successfuly got users'});
+    });
+
+// export class Users {
+//     public routes(app): void {
+//         app.route('/')
+//             .get((req: Request, res: Response) => {
+//                 console.log("GET request received at /users");
+//                 res.json({ message: "GET request received at /users" });
+//             })
+//     }
+// }
