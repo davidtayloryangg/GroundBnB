@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as express from "express";
 export const listingRoutes = express.Router();
-//import {getAllListing} from "../data"
+import {getAllListings} from "../data"
 import * as distance from "geo-distance"
 
 
@@ -10,9 +10,13 @@ import * as distance from "geo-distance"
 */
 listingRoutes.get('/search/location', async (req: Request, res: Response) => {
     console.log("GET /listings/search/location");
-    /** Send request to /search/location?lat=xxxx&lon=xxx */
     const location = { lat : req.query.lat, lon : req.query.lon}
-
-    res.json({message: 'successfuly got listings'});
+    const listings = await getAllListings();
+    const sortedListings = listings.sort((a,b) => {
+        const aDistance = distance.between(location, {lat: a.address.geolocation[0], lon: a.address.geolocation.get[1]}).human_readable().distance;
+        const bDistance = distance.between(location, {lat: b.address.geolocation[0], lon: b.address.geolocation[1]}).human_readable().distance;
+        return aDistance - bDistance;
+    });
+    res.json(sortedListings);
     }
 );
