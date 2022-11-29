@@ -67,6 +67,34 @@ async function validUID(uid: string): Promise<void> {
   if (!userSnap.exists()) throw "Invalid UID";
 }
 
+function validateCity(city: string) {
+  // Checks if city is a string
+  if (typeof city !== "string") throw `${city} is not a string.`;
+  // Checks if city contains only letters
+  if (/[^a-z ]/i.test(city)) throw "Invalid city";
+  // Checks if city is at least 2 characters
+  if (city.length < 2) throw "Invalid city.";
+}
+
+function validateState(state: string) {
+  // Checks if state is a string
+  if (typeof state !== "string") throw `${state} is not a string.`;
+  let states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
+  // Converts state to uppercase
+  state = state.toUpperCase();
+  // Checks that state is in states array
+  if (!states.includes(state)) throw 'Invalid state.';
+}
+
+function validateZip(zip: string) {
+  // Checks if zip is a string
+  if (typeof zip !== "string") throw `${zip} is not a string.`;
+  // Checks if zip is 5 digits
+  if (zip.length !== 5) throw 'Invalid zip.';
+  // Checks if zip only contains numbers
+  if (!/^\d+$/.test(zip)) throw 'Invalid zip.';
+}
+
 export {
   validString,
   validNumber,
@@ -75,4 +103,7 @@ export {
   validTime,
   validRating,
   validUID,
+  validateCity,
+  validateState,
+  validateZip
 };
