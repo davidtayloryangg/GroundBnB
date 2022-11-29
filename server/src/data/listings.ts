@@ -6,11 +6,19 @@ const Timestamp = firestore.Timestamp;
 
 export const getAllListings = async () => {
     const querySnapshot = await firestore.getDocs(collection);
-    console.log(querySnapshot);
-    
-    const listings = querySnapshot.docs.map(doc => 
-        console.log(doc.data()));
-        
-        // doc.data());
+    const listings = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        // TODO MISSING PRICE PER DAY IN DATA
+        return {
+            id: doc.id,
+            description: data.description,
+            address: data.address,
+            imagesUrls: data.imageUrls,
+            ownerId: data.owner,
+            numberOfBookings: data.numberOfBookings,
+            reviews: data.reviews,
+        }
+    });
+
     return listings;
 }
