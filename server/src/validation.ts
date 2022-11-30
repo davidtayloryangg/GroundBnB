@@ -79,20 +79,86 @@ function validateCity(city: string) {
 function validateState(state: string) {
   // Checks if state is a string
   if (typeof state !== "string") throw `${state} is not a string.`;
-  let states = [ 'AL', 'AK', 'AS', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FM', 'FL', 'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MH', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'MP', 'OH', 'OK', 'OR', 'PW', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA', 'WA', 'WV', 'WI', 'WY' ];
+  let states = [
+    "AL",
+    "AK",
+    "AS",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "DC",
+    "FM",
+    "FL",
+    "GA",
+    "GU",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MH",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "MP",
+    "OH",
+    "OK",
+    "OR",
+    "PW",
+    "PA",
+    "PR",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VI",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY",
+  ];
   // Converts state to uppercase
   state = state.toUpperCase();
   // Checks that state is in states array
-  if (!states.includes(state)) throw 'Invalid state.';
+  if (!states.includes(state)) throw "Invalid state.";
 }
 
 function validateZip(zip: string) {
   // Checks if zip is a string
   if (typeof zip !== "string") throw `${zip} is not a string.`;
   // Checks if zip is 5 digits
-  if (zip.length !== 5) throw 'Invalid zip.';
+  if (zip.length !== 5) throw "Invalid zip.";
   // Checks if zip only contains numbers
-  if (!/^\d+$/.test(zip)) throw 'Invalid zip.';
+  if (!/^\d+$/.test(zip)) throw "Invalid zip.";
+}
+
+function validateReview(text: string, date: string, rating: Number) {
+  validDate(date);
+  validRating(rating);
+  validString(text);
 }
 
 export {
@@ -105,5 +171,6 @@ export {
   validUID,
   validateCity,
   validateState,
-  validateZip
+  validateZip,
+  validateReview,
 };
