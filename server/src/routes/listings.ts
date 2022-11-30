@@ -17,6 +17,6 @@ listingRoutes.get('/search/location', async (req: Request, res: Response) => {
         const bDistance = distance.between(location, {lat: b.address.geolocation[0], lon: b.address.geolocation[1]}).human_readable().distance;
         return aDistance - bDistance;
     });
-    res.json(listings);
+    res.json(sortedListings);
     }
 );
