@@ -12,6 +12,10 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
+export const createListing = async () => {
+
+};
+
 export const addReview = async (listingId, userId, rating, text, date) => {
   await firestore.updateDoc(doc(db, "listings", listingId), {
     reviews: firestore.arrayUnion({

@@ -55,3 +55,38 @@ listingRoutes.post(
     res.json({ message: "Review added successfully", listing: updatedListing });
   }
 );
+
+listingRoutes.post('/create', async (req: Request, res: Response) => {
+  console.log("POST /listings/create");
+  const name = new xss.FilterXSS().process(req.body.name).trim();
+  const description = new xss.FilterXSS().process(req.body.description).trim();
+  const price = new xss.FilterXSS().process(req.body.price).trim();
+  const street = new xss.FilterXSS().process(req.body.street).trim();
+  const city = new xss.FilterXSS().process(req.body.city).trim();
+  const state = new xss.FilterXSS().process(req.body.state).trim();
+  const zip = new xss.FilterXSS().process(req.body.zip).trim();
+  const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
+  const imageArray = req.body.imageArray;
+
+  try {
+    validation.validString(name);
+    validation.validString(description);
+    // valid price
+    validation.validString(street);
+    validation.validateCity(city);
+    validation.validateState(state);
+    validation.validateZip(zip);
+    validation.validUID(ownerId);
+    // validate images?
+  } catch (e) {
+    return res.status(400).json({ message: e })
+  }
+
+  try {
+    // data function call
+    const newListing = listingsData.createListing();
+    return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
+  } catch (e) {
+    return res.status(500).json({ message: e })
+  }
+});
