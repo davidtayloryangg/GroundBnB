@@ -10,7 +10,7 @@ import * as distance from "geo-distance"
 */
 listingRoutes.get('/search/location', async (req: Request, res: Response) => {
     console.log("GET /listings/search/location");
-    const location = { lat : parseFloat(req.query.lat.toString()), lon : req.query.lon.toString()}
+    const location = { lat : parseFloat(req.query.lat.toString()), lon : parseFloat(req.query.lon.toString())}
     const listings = await getAllListings();
     const sortedListings = listings.sort((a,b) => {
         const aDistance = distance.between(location, {lat: a.address.geolocation.latitude, lon: a.address.geolocation.longitude}).human_readable().distance;
