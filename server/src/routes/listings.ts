@@ -13,8 +13,8 @@ listingRoutes.get('/search/location', async (req: Request, res: Response) => {
     const location = { lat : parseFloat(req.query.lat.toString()), lon : req.query.lon.toString()}
     const listings = await getAllListings();
     const sortedListings = listings.sort((a,b) => {
-        const aDistance = distance.between(location, {lat: a.address.geolocation[0], lon: a.address.geolocation[1]}).human_readable().distance;
-        const bDistance = distance.between(location, {lat: b.address.geolocation[0], lon: b.address.geolocation[1]}).human_readable().distance;
+        const aDistance = distance.between(location, {lat: a.address.geolocation.latitude, lon: a.address.geolocation.longitude}).human_readable().distance;
+        const bDistance = distance.between(location, {lat: b.address.geolocation.latitude, lon: b.address.geolocation.longitude}).human_readable().distance;
         return aDistance - bDistance;
     });
     res.json(sortedListings);
