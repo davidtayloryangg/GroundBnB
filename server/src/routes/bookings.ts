@@ -14,8 +14,8 @@ bookingRoutes.post(
       res.status(404).json({ message: "Booking not found" });
       return;
     }
-    if (booking.status === "CANCELLED") {
-      res.status(400).json({ message: "Booking already cancelled" });
+    if (booking.status === "CANCELED") {
+      res.status(400).json({ message: "Booking already canceled" });
       return;
     }
 
@@ -26,11 +26,11 @@ bookingRoutes.post(
       return;
     }
 
-    const cancelledBooking = await bookingsData.getBooking(bookingId);
+    const canceledBooking = await bookingsData.getBooking(bookingId);
 
     res.json({
-      message: "Booking cancelled successfully",
-      booking: cancelledBooking,
+      message: "Booking canceled successfully",
+      booking: canceledBooking,
     });
   }
 );

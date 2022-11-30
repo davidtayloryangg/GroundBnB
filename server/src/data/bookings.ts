@@ -4,7 +4,7 @@ const doc = firestore.doc;
 
 export const cancelBooking = async (bookingId: string) => {
   await firestore.updateDoc(doc(db, "bookings", bookingId), {
-    status: "CANCELLED",
+    status: "CANCELED",
   });
 };
 
