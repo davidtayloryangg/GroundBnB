@@ -4,7 +4,7 @@ import * as listingsData from "../data/listings";
 import * as validation from "../validation";
 import * as xss from "xss";
 import * as multer from 'multer';
-const upload = multer();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 export const listingRoutes = express.Router();
 
 /**Getting listing and sorting from closest to furthest
@@ -58,8 +58,7 @@ listingRoutes.post(
   }
 );
 
-// listingRoutes.post('/create', upload.array('imageArray'), async (req: Request, res: Response) => {
-listingRoutes.post('/create', async (req: Request, res: Response) => {
+listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request, res: Response) => {
   console.log("POST /listings/create");
   const title = new xss.FilterXSS().process(req.body.title).trim();
   const description = new xss.FilterXSS().process(req.body.description).trim();
@@ -71,7 +70,7 @@ listingRoutes.post('/create', async (req: Request, res: Response) => {
   const lat = parseFloat(req.body.lat);
   const lon = parseFloat(req.body.lon);
   const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
-  const imageArray = req.body.imageArray;
+  const imageArray = req.files;
 
   try {
     validation.validString(title);
@@ -83,9 +82,6 @@ listingRoutes.post('/create', async (req: Request, res: Response) => {
     validation.validateZip(zip);
     validation.validUID(ownerId);
     // validate images
-    for (const image of imageArray) {
-      validation.validString(image);
-    }
   } catch (e) {
     return res.status(400).json({ message: e })
   }

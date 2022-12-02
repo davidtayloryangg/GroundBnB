@@ -1,5 +1,5 @@
 import * as firestore from "firebase/firestore";
-import { ref, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, uploadString, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase/config';
 const collection = firestore.collection(db, "listings");
 const doc = firestore.doc;
@@ -14,7 +14,7 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
-export const createListing = async (title: String, description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray: Array<String>) => {
+export const createListing = async (title: String, description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray) => {
   const docRef = await firestore.addDoc(collection, {
     title: title,
     description: description,
@@ -36,8 +36,12 @@ export const createListing = async (title: String, description: String, price: N
   let imageUrls = [];
 
   for (let i = 0; i < imageArray.length; i++) {
-    ref(storage, `${ownerId}/${docRef.id}-${i}`);
-    getDownloadURL(ref(storage, `${ownerId}/${docRef.id}-${i}`))
+    const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
+    const fileToUpload = imageArray[i].buffer.toString('base64');
+    await uploadString(storageRef, fileToUpload, 'base64')
+      .then((snapshot) => console.log('File uploaded!'))
+      .catch((e) => console.log(e));
+    await getDownloadURL(ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`))
       .then((url) => imageUrls.push(url));
   }
 
@@ -45,7 +49,7 @@ export const createListing = async (title: String, description: String, price: N
   await firestore.updateDoc(doc(db, 'listings', docRef.id), {
     imageUrls: imageUrls
   });
-  
+
   return docRef.id;
 };
 
