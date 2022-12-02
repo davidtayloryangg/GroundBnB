@@ -60,14 +60,12 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
 
   const bookerId = new xss.FilterXSS().process(req.body.bookerId).trim();
   const listingId = new xss.FilterXSS().process(req.body.listingId).trim();
-  const numOfPeople = parseInt(req.body.numOfPeople);
+  const numOfPeople = req.body.numOfPeople;
   const endTimestamp = req.body.endTimestamp;
   const startTimestamp = req.body.startTimestamp;
 
   try {
-    validation.validString(bookerId);
-    validation.validString(listingId);
-    validation.validNumber(numOfPeople);
+    validation.validNumOfPeople(numOfPeople);
     validation.validDate(endTimestamp);
     validation.validDate(startTimestamp);
     await validation.validUID(bookerId);

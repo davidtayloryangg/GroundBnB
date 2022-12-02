@@ -173,6 +173,13 @@ function validateReview(text: string, date: string, rating: Number) {
   validString(text);
 }
 
+function validNumOfPeople(numOfPeople : Number) {
+  // Checks if numOfPeople is a number
+  if (typeof numOfPeople !== "number") throw `${numOfPeople} is not a number.`;
+  // Checks if numOfPeople is an integer
+  if (!Number.isInteger(numOfPeople)) throw 'Invalid number of people.';
+}
+
 export {
   validString,
   validNumber,
@@ -185,5 +192,6 @@ export {
   validateState,
   validateZip,
   validateReview,
-  validListingId
+  validListingId,
+  validNumOfPeople
 };
