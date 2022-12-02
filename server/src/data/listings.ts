@@ -42,7 +42,11 @@ export const createListing = async (title: String, description: String, price: N
   }
 
   // update listing with the image urls
-
+  await firestore.updateDoc(doc(db, 'listings', docRef.id), {
+    imageUrls: imageUrls
+  });
+  
+  return docRef.id;
 };
 
 export const addReview = async (listingId, userId, rating, text, date) => {

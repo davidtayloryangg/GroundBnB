@@ -3,6 +3,8 @@ import * as express from "express";
 import * as listingsData from "../data/listings";
 import * as validation from "../validation";
 import * as xss from "xss";
+import * as multer from 'multer';
+const upload = multer();
 export const listingRoutes = express.Router();
 
 /**Getting listing and sorting from closest to furthest
@@ -56,6 +58,7 @@ listingRoutes.post(
   }
 );
 
+// listingRoutes.post('/create', upload.array('imageArray'), async (req: Request, res: Response) => {
 listingRoutes.post('/create', async (req: Request, res: Response) => {
   console.log("POST /listings/create");
   const title = new xss.FilterXSS().process(req.body.title).trim();
@@ -89,7 +92,8 @@ listingRoutes.post('/create', async (req: Request, res: Response) => {
 
   try {
     // data function call
-    const newListing = listingsData.createListing(title, description, price, street, city, state, zip, lat, lon, ownerId, imageArray);
+    const newListingId = await listingsData.createListing(title, description, price, street, city, state, zip, lat, lon, ownerId, imageArray);
+    const newListing = await listingsData.getListing(newListingId);
     return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
   } catch (e) {
     return res.status(500).json({ message: e })
