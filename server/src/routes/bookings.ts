@@ -55,14 +55,12 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   console.log("POST /bookings/create");
 
   new xss.FilterXSS().process(req.body.numOfPeople).trim();
-  new xss.FilterXSS().process(req.body.totalPrice).trim();
   new xss.FilterXSS().process(req.body.endTimestamp).trim();
   new xss.FilterXSS().process(req.body.startTimestamp).trim();
 
   const bookerId = new xss.FilterXSS().process(req.body.bookerId).trim();
   const listingId = new xss.FilterXSS().process(req.body.listingId).trim();
   const numOfPeople = parseInt(req.body.numOfPeople);
-  const totalPrice = parseFloat(req.body.totalPrice);
   const endTimestamp = req.body.endTimestamp;
   const startTimestamp = req.body.startTimestamp;
 
@@ -70,7 +68,6 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
     validation.validString(bookerId);
     validation.validString(listingId);
     validation.validNumber(numOfPeople);
-    validation.validNumber(totalPrice);
     validation.validDate(endTimestamp);
     validation.validDate(startTimestamp);
     await validation.validUID(bookerId);
@@ -159,7 +156,6 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   
 
   const diffInDays = Math.round((endDateJustDate.getTime() - startDateJustDate.getTime()) / (1000 * 60 * 60 * 24));
-  const booking = await bookingsData.createBooking(bookerId, listingId, numOfPeople, listingFound.ownerId, (listingFound.price * (diffInDays + 1)), endDateJustDate.toString(), startDateJustDate.toString());
-
+  const booking = await bookingsData.createBooking(bookerId, listingId, numOfPeople, listingFound.owner, (listingFound.price * (diffInDays + 1)), endDateJustDate.toString(), startDateJustDate.toString());
   res.status(200).json(booking);
 });
