@@ -67,6 +67,18 @@ async function validUID(uid: string): Promise<void> {
   if (!userSnap.exists()) throw "Invalid UID";
 }
 
+async function validListingId(listingId : string): Promise<void> {
+  // Checks if listingId is a string
+  if (typeof listingId !== "string") throw `${listingId} is not a string`;
+  // Checks if listingId contains spaces
+  if (/\s/g.test(listingId)) throw "Invalid listingId";
+  // Gets the listing document
+  const listingRef = doc(db, "listings", listingId);
+  const listingSnap = await getDoc(listingRef);
+  // Checks if doc is undefined
+  if (!listingSnap.exists()) throw "Invalid listingId";
+}
+
 function validateCity(city: string) {
   // Checks if city is a string
   if (typeof city !== "string") throw `${city} is not a string.`;
@@ -173,4 +185,5 @@ export {
   validateState,
   validateZip,
   validateReview,
+  validListingId
 };
