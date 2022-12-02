@@ -39,7 +39,7 @@ export const getAllBookings = async () => {
   }
 
   return bookings.docs.map((booking) => {
-    return booking.data;
+    return booking.data();
   });
 };
 
