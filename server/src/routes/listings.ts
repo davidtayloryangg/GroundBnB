@@ -62,7 +62,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
   console.log("POST /listings/create");
   const title = new xss.FilterXSS().process(req.body.title).trim();
   const description = new xss.FilterXSS().process(req.body.description).trim();
-  const price = req.body.price;
+  const price = parseFloat(req.body.price);
   const street = new xss.FilterXSS().process(req.body.street).trim();
   const city = new xss.FilterXSS().process(req.body.city).trim();
   const state = new xss.FilterXSS().process(req.body.state).trim();
@@ -75,13 +75,16 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
   try {
     validation.validString(title);
     validation.validString(description);
-    // valid price
+    validation.validPrice(price);
     validation.validString(street);
     validation.validateCity(city);
     validation.validateState(state);
     validation.validateZip(zip);
     validation.validUID(ownerId);
     // validate images
+    for (let i = 0; i < imageArray.length; i++) {
+      validation.validFile(imageArray[i]);
+    }
   } catch (e) {
     return res.status(400).json({ message: e })
   }

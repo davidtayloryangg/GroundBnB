@@ -18,7 +18,7 @@ export const createListing = async (title: String, description: String, price: N
   const docRef = await firestore.addDoc(collection, {
     title: title,
     description: description,
-    price: price,
+    price: price.toFixed(2),
     ownerId: ownerId,
     address: {
       street: street,
