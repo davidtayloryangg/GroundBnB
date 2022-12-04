@@ -60,7 +60,6 @@ listingRoutes.post(
 
 listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request, res: Response) => {
   console.log("POST /listings/create");
-  const title = new xss.FilterXSS().process(req.body.title).trim();
   const description = new xss.FilterXSS().process(req.body.description).trim();
   const price = parseFloat(req.body.price);
   const street = new xss.FilterXSS().process(req.body.street).trim();
@@ -73,7 +72,6 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
   const imageArray = req.files;
 
   try {
-    validation.validString(title);
     validation.validString(description);
     validation.validPrice(price);
     validation.validString(street);
@@ -90,7 +88,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
 
   try {
     // data function call
-    const newListingId = await listingsData.createListing(title, description, price, street, city, state, zip, lat, lon, ownerId, imageArray);
+    const newListingId = await listingsData.createListing(description, price, street, city, state, zip, lat, lon, ownerId, imageArray);
     const newListing = await listingsData.getListing(newListingId);
     return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
   } catch (e) {

@@ -14,9 +14,8 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
-export const createListing = async (title: String, description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray) => {
+export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray) => {
   const docRef = await firestore.addDoc(collection, {
-    title: title,
     description: description,
     price: parseFloat(price.toFixed(2)),
     ownerId: ownerId,
