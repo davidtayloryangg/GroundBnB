@@ -79,6 +79,11 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
     return;
   }
 
+  if (listingFound.ownerId === bookerId) {
+    res.status(409).json({ message : 'Owner cannot book their own listing'});
+    return;
+  }
+
   const startDate = new Date(startTimestamp);
   const endDate = new Date(endTimestamp);
   const today = new Date();
