@@ -4,23 +4,35 @@ import * as listingsData from "../data/listings";
 import * as validation from "../validation";
 import * as xss from "xss";
 export const listingRoutes = express.Router();
-import {getAllListings} from "../data"
-import * as distance from "geo-distance"
+import { getAllListings } from "../data";
+import * as distance from "geo-distance";
 
-
-/**Getting listing and sorting from closest to furthest 
+/**Getting listing and sorting from closest to furthest
  * Client send request to /search/location?lat=xxxx&lon=xxx
-*/
-listingRoutes.get('/search/location', async (req: Request, res: Response) => {
-    console.log("GET /listings/search/location");
-    const location = { lat : parseFloat(req.query.lat.toString()), lon : parseFloat(req.query.lon.toString())}
-    const listings = await getAllListings();
-    const sortedListings = listings.sort((a,b) => {
-        const aDistance = distance.between(location, {lat: a.address.geolocation.latitude, lon: a.address.geolocation.longitude}).human_readable().distance;
-        const bDistance = distance.between(location, {lat: b.address.geolocation.latitude, lon: b.address.geolocation.longitude}).human_readable().distance;
-        return aDistance - bDistance;
-    });
-    res.json(sortedListings);
+ */
+listingRoutes.get("/search/location", async (req: Request, res: Response) => {
+  console.log("GET /listings/search/location");
+  const location = {
+    lat: parseFloat(req.query.lat.toString()),
+    lon: parseFloat(req.query.lon.toString()),
+  };
+  const listings = await getAllListings();
+  const sortedListings = listings.sort((a, b) => {
+    const aDistance = distance
+      .between(location, {
+        lat: a.address.geolocation.latitude,
+        lon: a.address.geolocation.longitude,
+      })
+      .human_readable().distance;
+    const bDistance = distance
+      .between(location, {
+        lat: b.address.geolocation.latitude,
+        lon: b.address.geolocation.longitude,
+      })
+      .human_readable().distance;
+    return aDistance - bDistance;
+  });
+  res.json(sortedListings);
 });
 
 listingRoutes.post(
@@ -50,12 +62,17 @@ listingRoutes.post(
     }
 
     const listing = await listingsData.getListing(listingId);
-    if (listing.owner === userId) {
+    if (listing.ownerId === userId) {
       res.status(400).json({ message: "Cannot review your own listing" });
       return;
     }
 
-    await listingsData.addReview(listingId, userId, rating, text, date);
+    try {
+      await listingsData.addReview(listingId, userId, rating, text, date);
+    } catch (e) {
+      res.status(500).json({ message: e });
+      return;
+    }
 
     const updatedListing = await listingsData.getListing(listingId);
 
