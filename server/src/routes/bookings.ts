@@ -54,15 +54,11 @@ bookingRoutes.get("/all", async (req: Request, res: Response) => {
 bookingRoutes.post("/create", async (req: Request, res: Response) => {
   console.log("POST /bookings/create");
 
-  new xss.FilterXSS().process(req.body.numOfPeople).trim();
-  new xss.FilterXSS().process(req.body.endTimestamp).trim();
-  new xss.FilterXSS().process(req.body.startTimestamp).trim();
-
   const bookerId = new xss.FilterXSS().process(req.body.bookerId).trim();
   const listingId = new xss.FilterXSS().process(req.body.listingId).trim();
-  const numOfPeople = req.body.numOfPeople;
-  const endTimestamp = req.body.endTimestamp;
-  const startTimestamp = req.body.startTimestamp;
+  const numOfPeople = parseInt(new xss.FilterXSS().process(req.body.numOfPeople).trim());
+  const endTimestamp = new xss.FilterXSS().process(req.body.endTimestamp).trim();
+  const startTimestamp = new xss.FilterXSS().process(req.body.startTimestamp).trim();
 
   try {
     validation.validNumOfPeople(numOfPeople);
@@ -154,6 +150,6 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   
 
   const diffInDays = Math.round((endDateJustDate.getTime() - startDateJustDate.getTime()) / (1000 * 60 * 60 * 24));
-  const booking = await bookingsData.createBooking(bookerId, listingId, numOfPeople, listingFound.owner, (listingFound.price * (diffInDays + 1)), endDateJustDate.toString(), startDateJustDate.toString());
+  const booking = await bookingsData.createBooking(bookerId, listingId, numOfPeople, listingFound.ownerId, (listingFound.price * (diffInDays + 1)), endDateJustDate.toString(), startDateJustDate.toString());
   res.status(200).json(booking);
 });
