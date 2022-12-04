@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const usersData = require("../reference-old/data").users;
+const usersData = require("../data").users;
 
 // Logs a user into the system
 // request body: username, password
