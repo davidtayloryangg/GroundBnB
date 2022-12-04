@@ -63,9 +63,7 @@ export const getListings = async (pageNum: number) => {
     listings.push(doc.data());
   });
   let nextURL: string =
-    totalListingsCount === docsReturnedCount
-      ? null
-      : `/listings/page/${pageNum + 1}`;
+    totalListingsCount === docsReturnedCount ? null : `${pageNum + 1}`;
   let returnObj = {
     next: nextURL,
     data: listings,
