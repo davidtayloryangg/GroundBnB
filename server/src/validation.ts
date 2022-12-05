@@ -165,6 +165,13 @@ function validateZip(zip: string) {
   if (!/^\d+$/.test(zip)) throw "Invalid zip.";
 }
 
+function validateImages(imageArray): void {
+  if (imageArray.length <= 0) throw "At least one image needs to be submitted";
+  for (let i = 0; i < imageArray.length; i++) {
+    this.validFile(imageArray[i]);
+  }
+}
+
 function validateReview(text: string, date: string, rating: Number) {
   validDate(date);
   validRating(rating);
@@ -185,4 +192,5 @@ export {
   validateState,
   validateZip,
   validateReview,
+  validateImages
 };

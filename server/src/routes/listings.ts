@@ -79,9 +79,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     validation.validateState(state);
     validation.validateZip(zip);
     validation.validUID(ownerId);
-    for (let i = 0; i < imageArray.length; i++) {
-      validation.validFile(imageArray[i]);
-    }
+    validation.validateImages(imageArray);
   } catch (e) {
     return res.status(400).json({ message: e })
   }
