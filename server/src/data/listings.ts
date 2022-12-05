@@ -28,12 +28,14 @@ export const createListing = async (description: String, price: Number, street: 
     },
     averageRating: 0,
     numOfBookings: 0,
-    // imageUrls: [], // need to get urls from cloud storage
+    // imageUrls: need to get urls from cloud storage
+    // listingId: is added below after doc creation
     reviews: []
   });
 
   let imageUrls = [];
 
+  // uploading images
   for (let i = 0; i < imageArray.length; i++) {
     const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
     const fileToUpload = imageArray[i].buffer.toString('base64');
@@ -44,9 +46,10 @@ export const createListing = async (description: String, price: Number, street: 
       .then((url) => imageUrls.push(url));
   }
 
-  // update listing with the image urls
+  // update listing with the image urls and listingId
   await firestore.updateDoc(doc(db, 'listings', docRef.id), {
-    imageUrls: imageUrls
+    imageUrls: imageUrls,
+    listingId: docRef.id
   });
 
   return docRef.id;
