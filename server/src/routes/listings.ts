@@ -79,3 +79,23 @@ listingRoutes.post(
     res.json({ message: "Review added successfully", listing: updatedListing });
   }
 );
+
+listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
+  const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
+
+  try {
+    validation.validString(listingId);
+  } catch (e) {
+    res.status(400).json({ message : e});
+    return;
+  }
+
+  const listingFound = await listingsData.getListing(listingId);
+
+  if(listingFound === null) {
+    res.status(404).json({ message : 'Listing not found'});
+    return;
+  } 
+
+  res.status(200).json(listingFound);
+});
