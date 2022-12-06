@@ -15,9 +15,9 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
-export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray) => {
+export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
   // check if address already exists
-  const q = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zip', '==', zip));
+  const q = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zipcode', '==', zipcode));
   const querySnapshot = await firestore.getDocs(q);
   if (!querySnapshot.empty) throw 'Listing address already exists';
   
@@ -30,7 +30,7 @@ export const createListing = async (description: String, price: Number, street: 
       street: street,
       city: city,
       state: state,
-      zip: zip,
+      zipcode: zipcode,
       geolocation: new GeoPoint(lat, lon)
     },
     averageRating: 0,

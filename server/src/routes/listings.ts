@@ -65,7 +65,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
   const street = new xss.FilterXSS().process(req.body.street).trim();
   const city = new xss.FilterXSS().process(req.body.city).trim();
   const state = new xss.FilterXSS().process(req.body.state).trim();
-  const zip = new xss.FilterXSS().process(req.body.zip).trim();
+  const zipcode = new xss.FilterXSS().process(req.body.zipcode).trim();
   const lat = parseFloat(req.body.lat);
   const lon = parseFloat(req.body.lon);
   const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
@@ -77,7 +77,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     validation.validString(street);
     validation.validateCity(city);
     validation.validateState(state);
-    validation.validateZip(zip);
+    validation.validateZip(zipcode);
     validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
@@ -86,7 +86,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
 
   try {
     // data function call
-    const newListingId = await listingsData.createListing(description, price, street, city, state, zip, lat, lon, ownerId, imageArray);
+    const newListingId = await listingsData.createListing(description, price, street, city, state, zipcode, lat, lon, ownerId, imageArray);
     const newListing = await listingsData.getListing(newListingId);
     return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
   } catch (e) {
