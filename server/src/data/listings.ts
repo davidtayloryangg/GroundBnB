@@ -17,9 +17,14 @@ export const getListing = async (listingId: string) => {
 
 export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
   // check if address already exists
-  const q = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zipcode', '==', zipcode));
-  const querySnapshot = await firestore.getDocs(q);
-  if (!querySnapshot.empty) throw 'Listing address already exists';
+  const q1 = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zipcode', '==', zipcode));
+  const querySnapshot1 = await firestore.getDocs(q1);
+  if (!querySnapshot1.empty) throw 'Listing address already exists';
+
+  const geolocation = new GeoPoint(lat, lon);
+  const q2 = firestore.query(collection, where('address.geolocation', '==', geolocation));
+  const querySnapshot2 = await firestore.getDocs(q2);
+  if (!querySnapshot2.empty) throw 'Listing address already exists';
   
   // add new listing to firestore
   const docRef = await firestore.addDoc(collection, {
@@ -31,7 +36,7 @@ export const createListing = async (description: String, price: Number, street: 
       city: city,
       state: state,
       zipcode: zipcode,
-      geolocation: new GeoPoint(lat, lon)
+      geolocation: geolocation
     },
     averageRating: 0,
     numOfBookings: 0,
