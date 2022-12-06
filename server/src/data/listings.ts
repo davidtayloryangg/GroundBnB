@@ -1,5 +1,6 @@
 import * as firestore from "firebase/firestore";
-import { ref, uploadBytes, uploadString, getDownloadURL } from 'firebase/storage';
+import { where } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase/config';
 const collection = firestore.collection(db, "listings");
 const doc = firestore.doc;
@@ -15,6 +16,12 @@ export const getListing = async (listingId: string) => {
 };
 
 export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zip: String, lat: number, lon: number, ownerId: String, imageArray) => {
+  // check if address already exists
+  const q = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zip', '==', zip));
+  const querySnapshot = await firestore.getDocs(q);
+  if (!querySnapshot.empty) throw 'Listing address already exists';
+  
+  // add new listing to firestore
   const docRef = await firestore.addDoc(collection, {
     description: description,
     price: parseFloat(price.toFixed(2)),
