@@ -9,7 +9,8 @@
     "dev": "ts-node ./src/server.ts",
     "build": "tsc",
     "prod": "npm run build && npm start",
-    "watch": "nodemon --exec ts-node -- ./scr/server.ts"
+    "watch": "nodemon --exec ts-node -- ./src/server.ts",
+    "debug": "nodemon --inspect ./src/server.ts"
   },
   "author": "David, Caroline, Matthew, Leena, Ronnie",
   "license": "MIT",
