@@ -7,6 +7,32 @@ export const listingRoutes = express.Router();
 import { getAllListings } from "../data";
 import * as distance from "geo-distance";
 
+listingRoutes.get("/page/:pagenum", async (req, res) => {
+  try {
+    // Declares a variable named pageNum, sets it equal to req.params.pagenum, and trims req.params.pagenum
+    let pageNum = Number(
+      new xss.FilterXSS().process(req.params.pagenum).trim()
+    );
+    // Checks if id is valid
+    if (pageNum <= 0 || isNaN(pageNum)) {
+      // Returns status code 400 with the error
+      return res.status(400).json({ error: "Invalid page number." });
+    }
+    // Gets listings
+    let listings = await listingsData.getListings(pageNum);
+    // Return the listings
+    res.status(200).json(listings);
+  } catch (e) {
+    console.log(e);
+    // Declares an object named returnJson
+    let returnJson = {
+      error: "Page Not found.",
+    };
+    // Returns status 404 and error
+    res.status(404).json(returnJson);
+  }
+});
+
 /**Getting listing and sorting from closest to furthest
  * Client send request to /search/location?lat=xxxx&lon=xxx
  */
