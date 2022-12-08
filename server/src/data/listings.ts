@@ -105,6 +105,8 @@ export const createListing = async (
         ).then((url) => imageUrls.push(url));
       })
       .catch((e) => console.log(e));
+    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+    fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
   }
   // update listing with the image urls and listingId
   await firestore.updateDoc(doc(db, "listings", docRef.id), {
