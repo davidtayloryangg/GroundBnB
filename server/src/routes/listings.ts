@@ -4,7 +4,9 @@ import * as listingsData from "../data/listings";
 import * as validation from "../validation";
 import * as xss from "xss";
 import * as multer from 'multer';
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+import * as im from 'imagemagick';
+// const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 export const listingRoutes = express.Router();
 
 /**Getting listing and sorting from closest to furthest
