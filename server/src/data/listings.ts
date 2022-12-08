@@ -1,14 +1,14 @@
 import * as firestore from "firebase/firestore";
 import { where } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase/config';
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../firebase/config";
 const collection = firestore.collection(db, "listings");
 const doc = firestore.doc;
 const Timestamp = firestore.Timestamp;
 const GeoPoint = firestore.GeoPoint;
-import * as im from 'imagemagick';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as im from "imagemagick";
+import * as fs from "fs";
+import * as path from "path";
 
 export const getListing = async (listingId: string) => {
   const listing = await firestore.getDoc(doc(db, "listings", listingId));
@@ -18,17 +18,53 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
-export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
+const cropImage = (image) => {
+  return new Promise((resolve, reject) => {
+    im.crop(
+      {
+        srcPath: image.path,
+        dstPath: `uploads-imagemagick/${image.filename}.jpg`,
+        width: 500,
+      },
+      (err, stdout) => {
+        if (err) reject(err);
+        resolve(stdout);
+      }
+    );
+  });
+};
+
+export const createListing = async (
+  description: String,
+  price: Number,
+  street: String,
+  city: String,
+  state: String,
+  zipcode: String,
+  lat: number,
+  lon: number,
+  ownerId: String,
+  imageArray
+) => {
   // check if address already exists
-  const q1 = firestore.query(collection, where('address.street', '==', street), where('address.city', '==', city), where('address.state', '==', state), where('address.zipcode', '==', zipcode));
+  const q1 = firestore.query(
+    collection,
+    where("address.street", "==", street),
+    where("address.city", "==", city),
+    where("address.state", "==", state),
+    where("address.zipcode", "==", zipcode)
+  );
   const querySnapshot1 = await firestore.getDocs(q1);
-  if (!querySnapshot1.empty) throw 'Listing address already exists';
+  if (!querySnapshot1.empty) throw "Listing address already exists";
 
   const geolocation = new GeoPoint(lat, lon);
-  const q2 = firestore.query(collection, where('address.geolocation', '==', geolocation));
+  const q2 = firestore.query(
+    collection,
+    where("address.geolocation", "==", geolocation)
+  );
   const querySnapshot2 = await firestore.getDocs(q2);
-  if (!querySnapshot2.empty) throw 'Listing coordinates already exists';
-  
+  if (!querySnapshot2.empty) throw "Listing coordinates already exists";
+
   // add new listing to firestore
   const docRef = await firestore.addDoc(collection, {
     description: description,
@@ -39,13 +75,13 @@ export const createListing = async (description: String, price: Number, street: 
       city: city,
       state: state,
       zipcode: zipcode,
-      geolocation: geolocation
+      geolocation: geolocation,
     },
     averageRating: 0,
     numOfBookings: 0,
     // imageUrls: need to get urls from cloud storage
     // listingId: is added below after doc creation
-    reviews: []
+    reviews: [],
   });
 
   let imageUrls = [];
@@ -53,36 +89,26 @@ export const createListing = async (description: String, price: Number, street: 
   // uploading images
   for (let i = 0; i < imageArray.length; i++) {
     const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
-    // OLD WAY OF UPLOADING IMAGES (WITHOUT USING IMAGEMAGIC)
-    // const fileToUpload = imageArray[i].buffer.toString('base64');
-    // await uploadString(storageRef, fileToUpload, 'base64')
-    //   .then((snapshot) => console.log('File uploaded!'))
-    //   .catch((e) => console.log(e));
-    im.crop({
-      srcPath: imageArray[i].path,
-      dstPath: `uploads-imagemagick/${imageArray[i].filename}.jpg`,
-      width: 500
-    }, async function uploadImage(err, result){
-      if (err) throw err;
-      console.log('Image resized and cropped');
-    });
+    await cropImage(imageArray[i]);
 
     const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
-    const fileToUpload = fs.readFileSync(path.resolve(__dirname, fileToUploadPath)).toString('base64');
+    const fileToUpload = fs
+      .readFileSync(path.resolve(__dirname, fileToUploadPath))
+      .toString("base64");
 
-    await uploadString(storageRef, fileToUpload, 'base64')
+    await uploadString(storageRef, fileToUpload, "base64")
       .then(async (snapshot) => {
-        console.log('File uploaded!');
-        await getDownloadURL(ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`))
-          .then((url) => imageUrls.push(url));
+        console.log("File uploaded!");
+        await getDownloadURL(
+          ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`)
+        ).then((url) => imageUrls.push(url));
       })
       .catch((e) => console.log(e));
   }
-  console.log(imageUrls);
   // update listing with the image urls and listingId
-  await firestore.updateDoc(doc(db, 'listings', docRef.id), {
+  await firestore.updateDoc(doc(db, "listings", docRef.id), {
     imageUrls: imageUrls,
-    listingId: docRef.id
+    listingId: docRef.id,
   });
 
   return docRef.id;
