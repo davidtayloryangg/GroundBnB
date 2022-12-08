@@ -36,13 +36,10 @@ async function doSocialSignUp(provider: string) {
     email: firebase.auth().currentUser.email,
     firstName: firebase.auth().currentUser.displayName.split(' ')[0],
     lastName: firebase.auth().currentUser.displayName.split(' ')[1],
-    birthDay: 1,
-    birthMonth: 1,
-    birthYear: 1900,
   });
 }
 
-async function doSignUpWithEmailAndPassword(email: string, password: string, displayName: string, birthDay: number, birthMonth: number, birthYear: number) {
+async function doSignUpWithEmailAndPassword(email: string, password: string, displayName: string) {
   await doCreateUserWithEmailAndPassword(email, password, displayName);
 
   await axios.post('http://localhost:4000/users/signup', {
@@ -50,9 +47,6 @@ async function doSignUpWithEmailAndPassword(email: string, password: string, dis
     email: email,
     firstName: displayName.split(' ')[0],
     lastName: displayName.split(' ')[1],
-    birthDay: birthDay,
-    birthMonth: birthMonth,
-    birthYear: birthYear,
   });
 }
 

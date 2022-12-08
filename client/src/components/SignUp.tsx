@@ -15,15 +15,13 @@ function SignUp() {
       return false;
     }
 
+    //TODO - add validation before firebase functions are called
+
     try {
-      //TODO - add validation before firebase functions are called
       await doSignUpWithEmailAndPassword(
         email.value,
         passwordOne.value,
-        firstName.value + ' ' + lastName.value,
-        birthdate.value.split('-')[2],
-        birthdate.value.split('-')[1],
-        birthdate.value.split('-')[0],
+        firstName.value + ' ' + lastName.value
       );
     } catch (error) {
       alert(error);
