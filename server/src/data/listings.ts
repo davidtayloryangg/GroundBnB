@@ -1,5 +1,5 @@
 import * as firestore from "firebase/firestore";
-import { where } from "firebase/firestore";
+import { where, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase/config";
 const collection = firestore.collection(db, "listings");
@@ -9,6 +9,28 @@ const GeoPoint = firestore.GeoPoint;
 import * as im from "imagemagick";
 import * as fs from "fs";
 import * as path from "path";
+
+const itemsPerPage = 10;
+
+
+export const getAllListings = async () => {
+  const querySnapshot = await firestore.getDocs(collection);
+  const listings = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    // TODO MISSING PRICE PER DAY IN DATA
+    return {
+      id: doc.id,
+      description: data.description,
+      address: data.address,
+      imagesUrls: data.imageUrls,
+      ownerId: data.owner,
+      numberOfBookings: data.numberOfBookings,
+      reviews: data.reviews,
+    };
+  });
+
+  return listings;
+};
 
 export const getListing = async (listingId: string) => {
   const listing = await firestore.getDoc(doc(db, "listings", listingId));
@@ -115,6 +137,43 @@ export const createListing = async (
   });
 
   return docRef.id;
+  
+export const getListings = async (pageNum: number) => {
+  let listingLimit: number = pageNum * itemsPerPage;
+  const first = query(
+    collection,
+    orderBy("averageRating"),
+    limit(listingLimit)
+  );
+  const snapshot = await firestore.getCountFromServer(collection);
+  let totalListingsCount: number = snapshot.data().count;
+  const documentSnapshots = await getDocs(first);
+  let docsReturnedCount: number = documentSnapshots.size;
+  if (listingLimit - 10 > docsReturnedCount) {
+    let returnObj = {
+      next: null,
+      data: [],
+    };
+    return returnObj;
+  }
+  let listingsDoc;
+  if (listingLimit > docsReturnedCount) {
+    let itemsToReturn = itemsPerPage - (listingLimit - docsReturnedCount);
+    listingsDoc = documentSnapshots.docs.slice(-itemsToReturn);
+  } else {
+    listingsDoc = documentSnapshots.docs.slice(-itemsPerPage);
+  }
+  let listings = [];
+  listingsDoc.forEach((doc) => {
+    listings.push(doc.data());
+  });
+  let nextURL: string =
+    totalListingsCount === docsReturnedCount ? null : `${pageNum + 1}`;
+  let returnObj = {
+    next: nextURL,
+    data: listings,
+  };
+  return returnObj;
 };
 
 export const addReview = async (listingId, userId, rating, text, date) => {

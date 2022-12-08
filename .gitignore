@@ -4,6 +4,7 @@
 **/uploads
 **/uploads-imagemagick
 **/.env
+**/.vscode
 /.pnp
 .pnp.js
 
