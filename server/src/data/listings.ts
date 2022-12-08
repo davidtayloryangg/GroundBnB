@@ -25,6 +25,7 @@ const cropImage = (image) => {
         srcPath: image.path,
         dstPath: `uploads-imagemagick/${image.filename}.jpg`,
         width: 500,
+        height: 500
       },
       (err, stdout) => {
         if (err) reject(err);
