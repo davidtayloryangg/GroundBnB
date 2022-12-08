@@ -137,7 +137,8 @@ export const createListing = async (
   });
 
   return docRef.id;
-  
+};
+
 export const getListings = async (pageNum: number) => {
   let listingLimit: number = pageNum * itemsPerPage;
   const first = query(

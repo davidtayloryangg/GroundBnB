@@ -211,7 +211,7 @@ export {
   validateState,
   validateZip,
   validateReview,
-  validateImages
+  validateImages,
   validListingId,
   validNumOfPeople
 };
