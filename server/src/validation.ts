@@ -15,6 +15,11 @@ function validNumber(num: Number): void {
   if (!Number.isInteger(num)) throw "Invalid number.";
 }
 
+function validPrice(num: Number): void {
+  // Checks if num is a number
+  if (typeof num !== "number") throw `${num} is not a valid price.`;
+}
+
 function validEmail(email: string): void {
   // Checks if email is a string
   if (typeof email !== "string") throw `${email} is not a string.`;
@@ -65,6 +70,11 @@ async function validUID(uid: string): Promise<void> {
   const userSnap = await getDoc(userRef);
   // Checks if doc is undefined
   if (!userSnap.exists()) throw "Invalid UID";
+}
+
+function validFile(multerFile): void {
+  // Check if valid jpeg file
+  if (multerFile.mimetype !== "image/jpeg") throw "Image must be a jpeg file";
 }
 
 async function validListingId(listingId: string): Promise<void> {
@@ -167,6 +177,13 @@ function validateZip(zip: string) {
   if (!/^\d+$/.test(zip)) throw "Invalid zip.";
 }
 
+function validateImages(imageArray): void {
+  if (imageArray.length <= 0) throw "At least one image needs to be submitted";
+  for (let i = 0; i < imageArray.length; i++) {
+    this.validFile(imageArray[i]);
+  }
+}
+
 function validateReview(text: string, date: string, rating: Number) {
   validDate(date);
   validRating(rating);
@@ -194,15 +211,18 @@ function emailFilter(email: string) {
 export {
   validString,
   validNumber,
+  validPrice,
   validEmail,
   validDate,
   validTime,
   validRating,
   validUID,
+  validFile,
   validateCity,
   validateState,
   validateZip,
   validateReview,
+  validateImages,
   validListingId,
   validNumOfPeople,
   stringFilter,

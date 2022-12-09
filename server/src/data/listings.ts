@@ -1,27 +1,36 @@
-import * as firestore from 'firebase/firestore';
-const db = require('../firebase/config').db;
-const collection = firestore.collection( db, 'listings' );
-const doc = firestore.doc
-const Timestamp = firestore.Timestamp;  
+import * as firestore from "firebase/firestore";
+import { where, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../firebase/config";
+const collection = firestore.collection(db, "listings");
+const doc = firestore.doc;
+const Timestamp = firestore.Timestamp;
+const GeoPoint = firestore.GeoPoint;
+import * as im from "imagemagick";
+import * as fs from "fs";
+import * as path from "path";
+
+const itemsPerPage = 10;
+
 
 export const getAllListings = async () => {
-    const querySnapshot = await firestore.getDocs(collection);
-    const listings = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
-        // TODO MISSING PRICE PER DAY IN DATA
-        return {
-            id: doc.id,
-            description: data.description,
-            address: data.address,
-            imagesUrls: data.imageUrls,
-            ownerId: data.owner,
-            numberOfBookings: data.numberOfBookings,
-            reviews: data.reviews,
-        }
-    });
+  const querySnapshot = await firestore.getDocs(collection);
+  const listings = querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+    // TODO MISSING PRICE PER DAY IN DATA
+    return {
+      id: doc.id,
+      description: data.description,
+      address: data.address,
+      imagesUrls: data.imageUrls,
+      ownerId: data.owner,
+      numberOfBookings: data.numberOfBookings,
+      reviews: data.reviews,
+    };
+  });
 
-    return listings;
-}
+  return listings;
+};
 
 export const getListing = async (listingId: string) => {
   const listing = await firestore.getDoc(doc(db, "listings", listingId));
@@ -29,6 +38,143 @@ export const getListing = async (listingId: string) => {
     return null;
   }
   return listing.data();
+};
+
+const cropImage = (image) => {
+  return new Promise((resolve, reject) => {
+    im.crop(
+      {
+        srcPath: image.path,
+        dstPath: `uploads-imagemagick/${image.filename}.jpg`,
+        width: 500,
+        height: 500
+      },
+      (err, stdout) => {
+        if (err) reject(err);
+        resolve(stdout);
+      }
+    );
+  });
+};
+
+export const createListing = async (
+  description: String,
+  price: Number,
+  street: String,
+  city: String,
+  state: String,
+  zipcode: String,
+  lat: number,
+  lon: number,
+  ownerId: String,
+  imageArray
+) => {
+  // check if address already exists
+  const q1 = firestore.query(
+    collection,
+    where("address.street", "==", street),
+    where("address.city", "==", city),
+    where("address.state", "==", state),
+    where("address.zipcode", "==", zipcode)
+  );
+  const querySnapshot1 = await firestore.getDocs(q1);
+  if (!querySnapshot1.empty) throw "Listing address already exists";
+
+  const geolocation = new GeoPoint(lat, lon);
+  const q2 = firestore.query(
+    collection,
+    where("address.geolocation", "==", geolocation)
+  );
+  const querySnapshot2 = await firestore.getDocs(q2);
+  if (!querySnapshot2.empty) throw "Listing coordinates already exists";
+
+  // add new listing to firestore
+  const docRef = await firestore.addDoc(collection, {
+    description: description,
+    price: parseFloat(price.toFixed(2)),
+    ownerId: ownerId,
+    address: {
+      street: street,
+      city: city,
+      state: state,
+      zipcode: zipcode,
+      geolocation: geolocation,
+    },
+    averageRating: 0,
+    numOfBookings: 0,
+    // imageUrls: need to get urls from cloud storage
+    // listingId: is added below after doc creation
+    reviews: [],
+  });
+
+  let imageUrls = [];
+
+  // uploading images
+  for (let i = 0; i < imageArray.length; i++) {
+    const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
+    await cropImage(imageArray[i]);
+
+    const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
+    const fileToUpload = fs
+      .readFileSync(path.resolve(__dirname, fileToUploadPath))
+      .toString("base64");
+
+    await uploadString(storageRef, fileToUpload, "base64")
+      .then(async (snapshot) => {
+        console.log("File uploaded!");
+        await getDownloadURL(
+          ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`)
+        ).then((url) => imageUrls.push(url));
+      })
+      .catch((e) => console.log(e));
+    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+    fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
+  }
+  // update listing with the image urls and listingId
+  await firestore.updateDoc(doc(db, "listings", docRef.id), {
+    imageUrls: imageUrls,
+    listingId: docRef.id,
+  });
+
+  return docRef.id;
+};
+
+export const getListings = async (pageNum: number) => {
+  let listingLimit: number = pageNum * itemsPerPage;
+  const first = query(
+    collection,
+    orderBy("averageRating"),
+    limit(listingLimit)
+  );
+  const snapshot = await firestore.getCountFromServer(collection);
+  let totalListingsCount: number = snapshot.data().count;
+  const documentSnapshots = await getDocs(first);
+  let docsReturnedCount: number = documentSnapshots.size;
+  if (listingLimit - 10 > docsReturnedCount) {
+    let returnObj = {
+      next: null,
+      data: [],
+    };
+    return returnObj;
+  }
+  let listingsDoc;
+  if (listingLimit > docsReturnedCount) {
+    let itemsToReturn = itemsPerPage - (listingLimit - docsReturnedCount);
+    listingsDoc = documentSnapshots.docs.slice(-itemsToReturn);
+  } else {
+    listingsDoc = documentSnapshots.docs.slice(-itemsPerPage);
+  }
+  let listings = [];
+  listingsDoc.forEach((doc) => {
+    listings.push(doc.data());
+  });
+  let nextURL: string =
+    totalListingsCount === docsReturnedCount ? null : `${pageNum + 1}`;
+  let returnObj = {
+    next: nextURL,
+    data: listings,
+  };
+  return returnObj;
 };
 
 export const addReview = async (listingId, userId, rating, text, date) => {
