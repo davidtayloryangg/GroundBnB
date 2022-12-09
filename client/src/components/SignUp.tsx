@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { doSignUpWithEmailAndPassword } from '../firebase/FirebaseFunctions';
 import { AuthContext } from '../firebase/Auth';
 import SocialSignIn from './SocialSignIn';
+import { emailFilter, stringFilter, isAtLeast13 } from '../Validation';
 
 function SignUp() {
   const { currentUser } = useContext(AuthContext);
@@ -18,6 +19,14 @@ function SignUp() {
     //TODO - add validation before firebase functions are called
 
     try {
+      email.value = emailFilter(email.value);
+      passwordOne.value = stringFilter(passwordOne.value);
+      firstName.value = stringFilter(firstName.value);
+      lastName.value = stringFilter(lastName.value);
+      birthdate.value = stringFilter(birthdate.value);
+
+      isAtLeast13(new Date(birthdate.value));
+
       await doSignUpWithEmailAndPassword(
         email.value,
         passwordOne.value,
