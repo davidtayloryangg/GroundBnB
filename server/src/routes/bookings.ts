@@ -51,6 +51,75 @@ bookingRoutes.get("/all", async (req: Request, res: Response) => {
   res.status(200).json(bookings);
 });
 
+bookingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
+  console.log("GET /bookings/owner/:ownerId");
+
+  const ownerId = new xss.FilterXSS().process(req.params.ownerId).trim();
+
+  try {
+    await validation.validUID(ownerId);
+  } catch (e) { 
+    res.status(400).json({ message : e });
+    return;
+  }
+
+  const bookings = await bookingsData.getBookingsByOwnerId(ownerId);
+
+  if (bookings.length === 0) {
+    res.status(404).json({ message : "No bookings found for this given ownerId"});
+    return;
+  }
+
+  res.status(200).json(bookings);
+});
+
+bookingRoutes.get("/booker/:bookerId", async (req: Request, res: Response) => {
+  console.log("GET /bookings/booker/:bookerId");
+
+  const bookerId = new xss.FilterXSS().process(req.params.bookerId).trim();
+
+  try {
+    await validation.validUID(bookerId);
+  } catch (e) { 
+    res.status(400).json({ message : e });
+    return;
+  }
+
+  const bookings = await bookingsData.getBookingsByBookerId(bookerId);
+
+  if (bookings.length === 0) {
+    res.status(404).json({ message : "No bookings found for this given bookerId"});
+    return;
+  }
+
+  res.status(200).json(bookings);
+});
+
+bookingRoutes.get("/listing/:listingId", async (req: Request, res: Response) => {
+  console.log("GET /bookings/listing/:listingId");
+
+  const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
+
+  try {
+    await validation.validListingId(listingId);
+  } catch (e) { 
+    res.status(400).json({ message : e });
+    return;
+  }
+
+  let excludeCanceledQueryParams = (req.query.excludeCanceled) ? new xss.FilterXSS().process(req.query.excludeCanceled.toString()).trim() : undefined;
+  let excludeCanceled = (excludeCanceledQueryParams && excludeCanceledQueryParams === 'true') ? true : false;
+
+  const bookings = await bookingsData.getBookingsByListingId(listingId, excludeCanceled);
+
+  if (bookings.length === 0) {
+    res.status(404).json({ message : "No bookings found for this given listingId"});
+    return;
+  }
+
+  res.status(200).json(bookings);
+});
+
 bookingRoutes.post("/create", async (req: Request, res: Response) => {
   console.log("POST /bookings/create");
 
@@ -101,7 +170,7 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
 
   // get all dates already booked for that listing
   const futureBookingsForListing = [];
-  const bookings = await bookingsData.getBookingsByListingId(listingId);
+  const bookings = await bookingsData.getBookingsByListingId(listingId, true);
   bookings.forEach((booking) => {
     const startDateJustDate = new Date(booking.startTimestamp.toDate().getFullYear(), booking.startTimestamp.toDate().getMonth(), booking.startTimestamp.toDate().getDate());
     const endDateJustDate = new Date(booking.endTimestamp.toDate().getFullYear(), booking.endTimestamp.toDate().getMonth(), booking.endTimestamp.toDate().getDate());

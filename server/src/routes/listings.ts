@@ -163,3 +163,23 @@ listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
 
   res.status(200).json(listingFound);
 });
+
+listingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
+  const ownerId = new xss.FilterXSS().process(req.params.ownerId).trim();
+
+  try {
+    await validation.validUID(ownerId);
+  } catch (e) {
+    res.status(400).json({ message : e });
+    return;
+  }  
+
+  const listingsFound = await listingsData.getListingByOwnerId(ownerId);
+
+    if (listingsFound === null) {
+      res.status(404).json({ message : 'No listings found for given ownerId' });
+      return;
+    }
+
+    res.status(200).json(listingsFound);
+});
