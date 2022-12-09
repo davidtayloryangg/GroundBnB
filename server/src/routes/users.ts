@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import * as express from "express";
 export const userRoutes = express.Router();
 import { createUser } from "../data";
+import * as xss from "xss";
+import * as validation from "../validation";
 
 //for testing purposes
 userRoutes.get("/", (req: Request, res: Response) => {
@@ -15,12 +17,16 @@ userRoutes.get("/", (req: Request, res: Response) => {
  */
 userRoutes.post("/signup", async (req: Request, res: Response) => {
   console.log("POST /users/signup");
-  let userId = req.body.userId;
-  let email = req.body.email;
-  let firstName = req.body.firstName;
-  let lastName = req.body.lastName;
+  let userId = new xss.FilterXSS().process(req.body.userId).trim();
+  let email = new xss.FilterXSS().process(req.body.email).trim();
+  let firstName = new xss.FilterXSS().process(req.body.firstName).trim();
+  let lastName = new xss.FilterXSS().process(req.body.lastName).trim();
+
   try {
-    // check if request body inputs are valid
+    email = validation.emailFilter(email);
+    validation.validUID(userId);
+    firstName = validation.stringFilter(firstName);
+    lastName = validation.stringFilter(lastName);
   } catch (e) {
     return res.status(400).json({ error: e });
   }
