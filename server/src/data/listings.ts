@@ -127,11 +127,11 @@ export const createListing = async (description: String, price: Number, street: 
   return docRef.id;
 };
 
-export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
+export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, userId: String, imageArray) => {
   // check if listing exists
   const listingData = await getListing(listingId);
   if (!listingData) throw 'Listing with listingId does not exist';
-  if (listingData.ownerId !== ownerId) throw 'Listing does not belong to user currently logged in';
+  if (listingData.ownerId !== userId) throw 'Listing does not belong to user currently logged in';
 
   // check if address already exists
   const q1 = firestore.query(
@@ -161,7 +161,7 @@ export const editListing = async (listingId: string, description: String, price:
   // uploading images
   let imageUrls = [];
   for (let i = 0; i < imageArray.length; i++) {
-    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+    const storageRef = ref(storage, `${userId}/${listingId}-${i}.jpg`);
     await cropImage(imageArray[i]);
 
     const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
@@ -173,7 +173,7 @@ export const editListing = async (listingId: string, description: String, price:
       .then(async (snapshot) => {
         console.log("File uploaded!");
         await getDownloadURL(
-          ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
+          ref(storage, `${userId}/${listingId}-${i}.jpg`)
         ).then((url) => imageUrls.push(url));
       })
       .catch((e) => console.log(e));
