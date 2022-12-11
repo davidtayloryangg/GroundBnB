@@ -224,6 +224,8 @@ export {
   validateCity,
   validateState,
   validateZip,
+  validLatitude,
+  validLongitude,
   validateReview,
   validateImages,
   validListingId,

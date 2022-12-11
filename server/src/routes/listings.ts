@@ -128,6 +128,8 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     validation.validateCity(city);
     validation.validateState(state);
     validation.validateZip(zipcode);
+    validation.validLatitude(lat);
+    validation.validLongitude(lon);
     validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
@@ -184,6 +186,8 @@ listingRoutes.put("/edit/:listingId", async (req: Request, res: Response) => {
     validation.validateCity(city);
     validation.validateState(state);
     validation.validateZip(zipcode);
+    validation.validLatitude(lat);
+    validation.validLongitude(lon);
     validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
