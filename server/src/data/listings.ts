@@ -1,6 +1,6 @@
 import * as firestore from "firebase/firestore";
 import { where, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { ref, uploadString, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../firebase/config";
 const collection = firestore.collection(db, "listings");
 const doc = firestore.doc;
@@ -127,11 +127,11 @@ export const createListing = async (description: String, price: Number, street: 
   return docRef.id;
 };
 
-export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, userId: String, imageArray) => {
+export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
   // check if listing exists
   const listingData = await getListing(listingId);
   if (!listingData) throw 'Listing with listingId does not exist';
-  if (listingData.ownerId !== userId) throw 'Listing does not belong to user currently logged in';
+  if (listingData.ownerId !== ownerId) throw 'Listing does not belong to user currently logged in';
 
   // check if address already exists
   const q1 = firestore.query(
@@ -158,10 +158,18 @@ export const editListing = async (listingId: string, description: String, price:
     if (doc.id !== listingId) throw "Listing address already exists";
   });
 
+  // delete current images
+  for (let i = 0; i < listingData.imageArray.length; i++) {
+    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+    deleteObject(storageRef)
+      .then(() => console.log('Image deleted'))
+      .catch((e) => console.log(e));
+  }
+
   // uploading images
   let imageUrls = [];
   for (let i = 0; i < imageArray.length; i++) {
-    const storageRef = ref(storage, `${userId}/${listingId}-${i}.jpg`);
+    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
     await cropImage(imageArray[i]);
 
     const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
@@ -173,7 +181,7 @@ export const editListing = async (listingId: string, description: String, price:
       .then(async (snapshot) => {
         console.log("File uploaded!");
         await getDownloadURL(
-          ref(storage, `${userId}/${listingId}-${i}.jpg`)
+          ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
         ).then((url) => imageUrls.push(url));
       })
       .catch((e) => console.log(e));

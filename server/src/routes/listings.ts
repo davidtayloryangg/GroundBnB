@@ -178,7 +178,7 @@ listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: 
   const zipcode = new xss.FilterXSS().process(req.body.zipcode).trim();
   const lat = parseFloat(req.body.lat);
   const lon = parseFloat(req.body.lon);
-  const userId = new xss.FilterXSS().process(req.body.userId).trim();
+  const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
   const imageArray = req.files;
 
   try {
@@ -190,14 +190,14 @@ listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: 
     validation.validateZip(zipcode);
     validation.validLatitude(lat);
     validation.validLongitude(lon);
-    validation.validUID(userId);
+    validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
     return res.status(400).json({ message: e })
   }
 
   try {
-    const updatedListingId = await listingsData.editListing(listingId, description, price, street, city, state, zipcode, lat, lon, userId, imageArray);
+    const updatedListingId = await listingsData.editListing(listingId, description, price, street, city, state, zipcode, lat, lon, ownerId, imageArray);
     const updatedListing = await listingsData.getListing(updatedListingId);
     return res.status(200).json({ message: 'Listing updated successfully', listing: updatedListing })
   } catch (e) {
