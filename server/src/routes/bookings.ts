@@ -44,8 +44,7 @@ bookingRoutes.get("/all", async (req: Request, res: Response) => {
   const bookings = await bookingsData.getAllBookings();
 
   if (bookings === null) {
-    res.status(404).json({ message : "No Bookings Found"});
-    return;
+    res.status(200).json([]);
   } 
 
   res.status(200).json(bookings);
@@ -64,12 +63,6 @@ bookingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
   }
 
   const bookings = await bookingsData.getBookingsByOwnerId(ownerId);
-
-  if (bookings.length === 0) {
-    res.status(404).json({ message : "No bookings found for this given ownerId"});
-    return;
-  }
-
   res.status(200).json(bookings);
 });
 
@@ -86,12 +79,6 @@ bookingRoutes.get("/booker/:bookerId", async (req: Request, res: Response) => {
   }
 
   const bookings = await bookingsData.getBookingsByBookerId(bookerId);
-
-  if (bookings.length === 0) {
-    res.status(404).json({ message : "No bookings found for this given bookerId"});
-    return;
-  }
-
   res.status(200).json(bookings);
 });
 
@@ -111,12 +98,6 @@ bookingRoutes.get("/listing/:listingId", async (req: Request, res: Response) => 
   let excludeCanceled = (excludeCanceledQueryParams && excludeCanceledQueryParams === 'true') ? true : false;
 
   const bookings = await bookingsData.getBookingsByListingId(listingId, excludeCanceled);
-
-  if (bookings.length === 0) {
-    res.status(404).json({ message : "No bookings found for this given listingId"});
-    return;
-  }
-
   res.status(200).json(bookings);
 });
 

@@ -175,11 +175,5 @@ listingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
   }  
 
   const listingsFound = await listingsData.getListingByOwnerId(ownerId);
-
-    if (listingsFound === null) {
-      res.status(404).json({ message : 'No listings found for given ownerId' });
-      return;
-    }
-
     res.status(200).json(listingsFound);
 });
