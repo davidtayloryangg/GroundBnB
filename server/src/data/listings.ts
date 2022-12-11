@@ -159,7 +159,7 @@ export const editListing = async (listingId: string, description: String, price:
   });
 
   // delete current images
-  for (let i = 0; i < listingData.imageArray.length; i++) {
+  for (let i = 0; i < listingData.imageUrls.length; i++) {
     const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
     deleteObject(storageRef)
       .then(() => console.log('Image deleted'))
