@@ -163,3 +163,30 @@ listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
 
   res.status(200).json(listingFound);
 });
+
+listingRoutes.put("/edit/:listingId", async (req: Request, res: Response) => {
+  console.log("PUT /listings/edit/:listingId");
+  const description = new xss.FilterXSS().process(req.body.description).trim();
+  const price = parseFloat(req.body.price);
+  const street = new xss.FilterXSS().process(req.body.street).trim();
+  const city = new xss.FilterXSS().process(req.body.city).trim();
+  const state = new xss.FilterXSS().process(req.body.state).trim();
+  const zipcode = new xss.FilterXSS().process(req.body.zipcode).trim();
+  const lat = parseFloat(req.body.lat);
+  const lon = parseFloat(req.body.lon);
+  const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
+  const imageArray = req.files;
+
+  try {
+    validation.validString(description);
+    validation.validPrice(price);
+    validation.validString(street);
+    validation.validateCity(city);
+    validation.validateState(state);
+    validation.validateZip(zipcode);
+    validation.validUID(ownerId);
+    validation.validateImages(imageArray);
+  } catch (e) {
+    return res.status(400).json({ message: e })
+  }
+})
