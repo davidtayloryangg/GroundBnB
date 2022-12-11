@@ -57,18 +57,7 @@ const cropImage = (image) => {
   });
 };
 
-export const createListing = async (
-  description: String,
-  price: Number,
-  street: String,
-  city: String,
-  state: String,
-  zipcode: String,
-  lat: number,
-  lon: number,
-  ownerId: String,
-  imageArray
-) => {
+export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
   // check if address already exists
   const q1 = firestore.query(
     collection,
@@ -138,6 +127,36 @@ export const createListing = async (
 
   return docRef.id;
 };
+
+export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
+  const listingData = await getListing(listingId);
+  if (!listingData) throw 'Listing with listingId does not exist';
+
+  // check if address already exists
+  const q1 = firestore.query(
+    collection,
+    where("address.street", "==", street),
+    where("address.city", "==", city),
+    where("address.state", "==", state),
+    where("address.zipcode", "==", zipcode)
+  );
+  const querySnapshot1 = await firestore.getDocs(q1);
+  if (querySnapshot1.size > 1) throw "Listing address already exists";
+  querySnapshot1.forEach((doc) => {
+    if (doc.id !== listingId) throw "Listing address already exists";
+  });
+
+  const geolocation = new GeoPoint(lat, lon);
+  const q2 = firestore.query(
+    collection,
+    where("address.geolocation", "==", geolocation)
+  );
+  const querySnapshot2 = await firestore.getDocs(q2);
+  if (querySnapshot2.size > 1) throw "Listing address already exists";
+  querySnapshot2.forEach((doc) => {
+    if (doc.id !== listingId) throw "Listing address already exists";
+  });
+}
 
 export const getListings = async (pageNum: number) => {
   let listingLimit: number = pageNum * itemsPerPage;

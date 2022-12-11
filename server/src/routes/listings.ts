@@ -193,4 +193,6 @@ listingRoutes.put("/edit/:listingId", async (req: Request, res: Response) => {
   } catch (e) {
     return res.status(400).json({ message: e })
   }
+
+  
 })
