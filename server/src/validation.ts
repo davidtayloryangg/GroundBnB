@@ -168,6 +168,20 @@ function validateState(state: string) {
   if (!states.includes(state)) throw "Invalid state.";
 }
 
+function validLatitude(lat: number) {
+  // Checks if latitude is a number
+  if (typeof lat !== 'number') throw 'Latitude must be a number';
+  // Checks if latitude is in the correct range
+  if (lat > 90 || lat < -90 ) throw 'Latitiude must be between -90 and 90';
+}
+
+function validLongitude(lon: number) {
+  // Checks if longitude is a number
+  if (typeof lon !== 'number') throw 'Longitude must be a number'
+  // Checks if longitude is in the correct range
+  if (lon > 180 || lon < -180 ) throw 'Longitude must be between -180 and 180';
+}
+
 function validateZip(zip: string) {
   // Checks if zip is a string
   if (typeof zip !== "string") throw `${zip} is not a string.`;
