@@ -133,7 +133,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
-    return res.status(400).json({ message: e })
+    return res.status(400).json({ message: e });
   }
 
   try {
@@ -142,7 +142,8 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     const newListing = await listingsData.getListing(newListingId);
     return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
   } catch (e) {
-    return res.status(500).json({ message: e })
+    if (e === 'Listing address already exists') return res.status(400).json({ message: e });
+    return res.status(500).json({ message: e });
   }
 });
 
@@ -166,8 +167,9 @@ listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
   res.status(200).json(listingFound);
 });
 
-listingRoutes.put("/edit/:listingId", async (req: Request, res: Response) => {
+listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: Request, res: Response) => {
   console.log("PUT /listings/edit/:listingId");
+  const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
   const description = new xss.FilterXSS().process(req.body.description).trim();
   const price = parseFloat(req.body.price);
   const street = new xss.FilterXSS().process(req.body.street).trim();
@@ -194,5 +196,12 @@ listingRoutes.put("/edit/:listingId", async (req: Request, res: Response) => {
     return res.status(400).json({ message: e })
   }
 
-  
-})
+  try {
+    const updatedListingId = await listingsData.editListing(listingId, description, price, street, city, state, zipcode, lat, lon, ownerId, imageArray);
+    const updatedListing = await listingsData.getListing(updatedListingId);
+    return res.status(200).json({ message: 'Listing updated successfully', listing: updatedListing })
+  } catch (e) {
+    if (e === 'Listing with listingId does not exist' || e === 'Listing address already exists') return res.status(400).json({ message: e });
+    return res.status(500).json({ message: e });
+  }
+});

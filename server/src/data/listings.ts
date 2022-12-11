@@ -96,9 +96,8 @@ export const createListing = async (description: String, price: Number, street: 
     reviews: [],
   });
 
-  let imageUrls = [];
-
   // uploading images
+  let imageUrls = [];
   for (let i = 0; i < imageArray.length; i++) {
     const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
     await cropImage(imageArray[i]);
@@ -129,8 +128,10 @@ export const createListing = async (description: String, price: Number, street: 
 };
 
 export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
+  // check if listing exists
   const listingData = await getListing(listingId);
   if (!listingData) throw 'Listing with listingId does not exist';
+  if (listingData.ownerId !== ownerId) throw 'Listing does not belong to user currently logged in';
 
   // check if address already exists
   const q1 = firestore.query(
@@ -156,6 +157,45 @@ export const editListing = async (listingId: string, description: String, price:
   querySnapshot2.forEach((doc) => {
     if (doc.id !== listingId) throw "Listing address already exists";
   });
+
+  // uploading images
+  let imageUrls = [];
+  for (let i = 0; i < imageArray.length; i++) {
+    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+    await cropImage(imageArray[i]);
+
+    const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
+    const fileToUpload = fs
+      .readFileSync(path.resolve(__dirname, fileToUploadPath))
+      .toString("base64");
+
+    await uploadString(storageRef, fileToUpload, "base64")
+      .then(async (snapshot) => {
+        console.log("File uploaded!");
+        await getDownloadURL(
+          ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
+        ).then((url) => imageUrls.push(url));
+      })
+      .catch((e) => console.log(e));
+    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+    fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
+  }
+
+  // update document
+  await firestore.updateDoc(doc(db, "listings", listingId), {
+    description: description,
+    price: parseFloat(price.toFixed(2)),
+    address: {
+      street: street,
+      city: city,
+      state: state,
+      zipcode: zipcode,
+      geolocation: geolocation,
+    },
+    imageUrls: imageUrls,
+  });
+
+  return listingId;
 }
 
 export const getListings = async (pageNum: number) => {

@@ -73,8 +73,9 @@ async function validUID(uid: string): Promise<void> {
 }
 
 function validFile(multerFile): void {
+  const validFileTypes = ['image/jpeg', 'image/jpg'];
   // Check if valid jpeg file
-  if (multerFile.mimetype !== 'image/jpeg') throw 'Image must be a jpeg file';
+  if (!validFileTypes.includes(multerFile.mimetype)) throw 'Image must be a jpeg or jpg file';
 }
 
 async function validListingId(listingId : string): Promise<void> {
