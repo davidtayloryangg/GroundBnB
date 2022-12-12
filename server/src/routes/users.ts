@@ -10,25 +10,26 @@ import * as userData from "../data/users";
 userRoutes.get("/", (req: Request, res: Response) => {
   console.log("GET /users");
   res.json({ message: "successfuly got users" });
+});
 
-userRoutes.get('/:userId', async (req: Request, res: Response) => {
-    const userId  = new xss.FilterXSS().process(req.params.userId).trim();
+userRoutes.get("/:userId", async (req: Request, res: Response) => {
+  const userId = new xss.FilterXSS().process(req.params.userId).trim();
 
-    try {
-        validation.validString(userId);
-    } catch (e) {
-        res.status(404).json({ message : e });
-        return;
-    }
+  try {
+    validation.validString(userId);
+  } catch (e) {
+    res.status(404).json({ message: e });
+    return;
+  }
 
-    const userFound = await userData.getUserByUserId(userId);
+  const userFound = await userData.getUserByUserId(userId);
 
-    if (userFound === null) {
-        res.status(404).json({ message : 'No user was found for the given userId'});
-        return;
-    }
+  if (userFound === null) {
+    res.status(404).json({ message: "No user was found for the given userId" });
+    return;
+  }
 
-    res.status(200).json(userFound);
+  res.status(200).json(userFound);
 });
 
 /**Create a new user Account
