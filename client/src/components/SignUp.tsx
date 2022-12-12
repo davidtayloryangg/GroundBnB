@@ -16,7 +16,6 @@ function SignUp() {
       return false;
     }
 
-    //TODO - add validation before firebase functions are called
 
     try {
       email.value = emailFilter(email.value);

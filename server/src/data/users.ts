@@ -11,6 +11,10 @@ export const createUser = async (
   firstName: string,
   lastName: string
 ) => {
+  const userDoc = await firestore.getDoc(doc(collection, userId));
+  if (userDoc.exists()) {
+    return userDoc.data();
+  }
   const user = {
     id: userId,
     email: email,

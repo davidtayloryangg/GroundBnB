@@ -4,13 +4,9 @@ import '../App.css';
 const SocialSignIn = (props: any) => {
   const socialSignOn = async (provider: string) => {
     try {
-      if (props.type === 'signup') {
-        await doSocialSignUp(provider);
-      }
-      else {
-        await doSocialSignIn(provider);
-      }
-    } catch (error) {
+      doSocialSignUp(provider);
+    }
+    catch (error) {
       alert(error);
     }
   };

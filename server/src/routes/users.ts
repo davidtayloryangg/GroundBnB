@@ -24,7 +24,6 @@ userRoutes.post("/signup", async (req: Request, res: Response) => {
 
   try {
     email = validation.emailFilter(email);
-    validation.validUID(userId);
     firstName = validation.stringFilter(firstName);
     lastName = validation.stringFilter(lastName);
   } catch (e) {
