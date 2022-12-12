@@ -18,8 +18,10 @@ export const getBooking = async (bookingId: string) => {
   return booking.data();
 };
 
-export const getBookingsByListingId = async (listingId : string) => {
-  const query = firestore.query(collection, firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE'));
+export const getBookingsByListingId = async (listingId : string, excludeCanceled : boolean) => {
+  const  query = (excludeCanceled) ? 
+                  firestore.query(collection, firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE')) : 
+                  firestore.query(collection, firestore.where('listingId', '==', listingId));
   const bookingsForListing = await firestore.getDocs(query);
   const bookingsFoundForListing = []
 
@@ -30,6 +32,34 @@ export const getBookingsByListingId = async (listingId : string) => {
   }
 
   return bookingsFoundForListing;
+};
+
+export const getBookingsByOwnerId = async (ownerId : string) => {
+  const query = firestore.query(collection, firestore.where('ownerId', '==', ownerId));
+  const bookingsByOwnerId = await firestore.getDocs(query);
+  const bookingsFoundForOwner = [];
+
+  if (!bookingsByOwnerId.empty) {
+    bookingsByOwnerId.forEach((booking) => {
+      bookingsFoundForOwner.push(booking.data());
+    });
+  }
+
+  return bookingsFoundForOwner;
+};
+
+export const getBookingsByBookerId = async (bookerId : string) => {
+  const query = firestore.query(collection, firestore.where('bookerId', '==', bookerId));
+  const bookingsForBooker = await firestore.getDocs(query);
+  const bookingsFoundForBooker = [];
+
+  if (!bookingsForBooker.empty) {
+    bookingsForBooker.forEach((booking) => {
+      bookingsFoundForBooker.push(booking.data());
+    });
+  }
+
+  return bookingsFoundForBooker;
 };
 
 export const getAllBookings = async () => {
