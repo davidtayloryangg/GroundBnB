@@ -40,6 +40,20 @@ export const getListing = async (listingId: string) => {
   return listing.data();
 };
 
+export const getListingByOwnerId = async (ownerId: string) => {
+  const query = firestore.query(collection, firestore.where('ownerId', '==', ownerId));
+  const listingsByOwnerId = await firestore.getDocs(query);
+  const listingsFoundForOwner = [];
+
+  if (!listingsByOwnerId.empty) {
+    listingsByOwnerId.forEach((listing) => {
+      listingsFoundForOwner.push(listing.data());
+    });
+  }
+
+  return listingsFoundForOwner;
+};
+
 const cropImage = (image) => {
   return new Promise((resolve, reject) => {
     im.crop(
