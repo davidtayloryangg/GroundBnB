@@ -1,9 +1,11 @@
+@import "~react-image-gallery/styles/css/image-gallery.css";
+
 .App {
   text-align: center;
 }
 
 .App-body {
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -12,9 +14,9 @@
 }
 
 .center {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .modal {
@@ -33,19 +35,54 @@
   padding: 20px;
 }
 
-
 .link {
   text-decoration: none;
-  color: black
- }
+  color: black;
+}
 
 .social-signin {
   width: 200px;
   height: 50px;
 }
 
-.sign-up-img{
+.sign-up-img {
   width: 200px;
   height: 50px;
 }
 
+.image-gallery-container .image-gallery-slides {
+  width: 401px;
+  height: 250px;
+  margin-top: -16px;
+  margin-left: -16px;
+}
+
+.image-gallery-container .image-gallery-slide .image-gallery-image {
+  height: 100%;
+}
+
+.welcome-message {
+  width: 100%;
+  height: 100px;
+  background-image: url("../public/imgs/grass.jpeg");
+  background-position: center;
+  background-repeat: repeat-x;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  text-align: center;
+  background-size: 250px;
+}
+
+.welcome-message > p {
+  color: #4a8500;
+  background-color: white;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.centered {
+  text-align: center;
+}
