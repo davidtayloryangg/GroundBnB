@@ -16,3 +16,17 @@ export const createUser = async (userId:string, email:string, firstName:string, 
         await firestore.setDoc(doc(collection, userId), user);
         return user;
 }
+
+export const getUserByUserId = async (userId: string) => {
+    const userFound = await firestore.getDoc(doc(db, "users", userId));
+
+    if(!userFound.exists()) {
+        return null;
+    }
+
+    const user = userFound.data();
+    return {
+        firstName : user.firstName,
+        lastName : user.lastName
+    };
+}
