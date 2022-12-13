@@ -10,6 +10,7 @@ import Navigation from './components/Navigation';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Landing from './components/Landing';
+import SingleListing from './components/SingleListing';
 
 export default function App() {
   return (
@@ -63,6 +64,7 @@ export default function App() {
             <Route path="/my-profile" />
             <Route path="/login" />
             <Route path="/signup" />
+            <Route path="/listing/:listingId" element={<SingleListing />}/>
           </Routes>
         </div>
       </Router>

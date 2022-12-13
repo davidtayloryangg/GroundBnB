@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { routes } from './routes';
+import * as cors from "cors";
 
 let totalRequest: number = 0;
 let dict: object = {};
@@ -26,6 +27,7 @@ class App {
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: false }));
         this.app.use(this.Logger);
+        this.app.use(cors());
     }
 }
 

@@ -23,7 +23,7 @@ export const getBookingsByListingId = async (listingId : string, excludeCanceled
                   firestore.query(collection, firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE')) : 
                   firestore.query(collection, firestore.where('listingId', '==', listingId));
   const bookingsForListing = await firestore.getDocs(query);
-  const bookingsFoundForListing = []
+  const bookingsFoundForListing = [];
 
   if(!bookingsForListing.empty) {
     bookingsForListing.forEach((booking) => {
