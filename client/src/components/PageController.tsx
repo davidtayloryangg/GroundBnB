@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 
 function PageController(props: any) {
-  let page = props.page;
   let nextUrl = props.nextUrl;
+  let prevUrl = props.prevUrl;
   let nextBtn;
   let previousBtn;
   let btnStyle = {
@@ -15,12 +15,12 @@ function PageController(props: any) {
     fontSize: "18px",
   };
 
-  if (page > 1) {
+  if (prevUrl != null) {
     previousBtn = (
       <Button
         style={btnStyle}
         component={Link}
-        to={`/listings/page/${page - 1}`}
+        to={prevUrl}
         variant="contained"
       >
         Previous
@@ -32,7 +32,7 @@ function PageController(props: any) {
       <Button
         style={btnStyle}
         component={Link}
-        to={`/listings/page/${parseInt(page) + 1}`}
+        to={nextUrl}
         variant="contained"
       >
         Next

@@ -155,16 +155,60 @@ export const createListing = async (
   return docRef.id;
 };
 
-export const getListings = async (pageNum: number) => {
+export const getListings = async (pageNum: number, filterBy: string | null) => {
   let listingLimit: number = pageNum * itemsPerPage;
-  const first = query(
-    collection,
-    orderBy("averageRating", "desc"),
-    limit(listingLimit)
-  );
+  let dbQuery;
+  console.log(filterBy);
+  switch (filterBy) {
+    case "rating-asc":
+      console.log("fitered by rating asc");
+      // console.log(filterBy);
+      dbQuery = query(
+        collection,
+        orderBy("averageRating"),
+        limit(listingLimit)
+      );
+      break;
+    case "rating-desc":
+      console.log("fitered by rating desc");
+      // console.log(filterBy);
+      dbQuery = query(
+        collection,
+        orderBy("averageRating", "desc"),
+        limit(listingLimit)
+      );
+      break;
+    case "price-asc":
+      console.log("fitered by price asc");
+      // console.log(filterBy);
+      dbQuery = query(collection, orderBy("price"), limit(listingLimit));
+      break;
+    case "price-desc":
+      console.log("fitered by price desc");
+      // console.log(filterBy);
+      dbQuery = query(
+        collection,
+        orderBy("price", "desc"),
+        limit(listingLimit)
+      );
+      break;
+    default:
+      console.log(filterBy);
+      dbQuery = query(
+        collection,
+        orderBy("averageRating", "desc"),
+        limit(listingLimit)
+      );
+      break;
+  }
+  // const first = query(
+  //   collection,
+  //   orderBy("averageRating", "desc"),
+  //   limit(listingLimit)
+  // );
   const snapshot = await firestore.getCountFromServer(collection);
   let totalListingsCount: number = snapshot.data().count;
-  const documentSnapshots = await getDocs(first);
+  const documentSnapshots = await getDocs(dbQuery);
   let docsReturnedCount: number = documentSnapshots.size;
   if (listingLimit - 10 > docsReturnedCount) {
     let returnObj = {

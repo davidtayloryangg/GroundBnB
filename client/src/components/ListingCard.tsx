@@ -23,6 +23,9 @@ function ListingCard(props: any) {
       thumbnail: image,
       originalWidth: 400,
       originalHeight: 350,
+      sizes: "(min-width: 400px) 350px, 100vw",
+      originalAlt: "listing image",
+      srcSet: `${image} 400w`,
     };
     galleryImages.push(imageObj);
   });

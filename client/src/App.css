@@ -68,7 +68,7 @@
   background-position: center;
   background-repeat: repeat-x;
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: center;
   text-align: center;
   background-size: 250px;
