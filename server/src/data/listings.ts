@@ -161,7 +161,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
   console.log(filterBy);
   switch (filterBy) {
     case "rating-asc":
-      console.log("fitered by rating asc");
       dbQuery = query(
         collection,
         orderBy("averageRating"),
@@ -169,7 +168,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       );
       break;
     case "rating-desc":
-      console.log("fitered by rating desc");
       dbQuery = query(
         collection,
         orderBy("averageRating", "desc"),
@@ -177,11 +175,9 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       );
       break;
     case "price-asc":
-      console.log("fitered by price asc");
       dbQuery = query(collection, orderBy("price"), limit(listingLimit));
       break;
     case "price-desc":
-      console.log("fitered by price desc");
       dbQuery = query(
         collection,
         orderBy("price", "desc"),
@@ -189,7 +185,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       );
       break;
     default:
-      console.log(filterBy);
       dbQuery = query(
         collection,
         orderBy("averageRating", "desc"),

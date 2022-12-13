@@ -16,7 +16,6 @@ listingRoutes.get("/page/:pagenum", async (req, res) => {
   let filterByQueryParams = req.query.filterBy
     ? new xss.FilterXSS().process(req.query.filterBy.toString()).trim()
     : null;
-  console.log("filterByQueryParams", filterByQueryParams);
   try {
     // Declares a variable named pageNum, sets it equal to req.params.pagenum, and trims req.params.pagenum
     let pageNum = Number(
@@ -196,10 +195,10 @@ listingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
   try {
     await validation.validUID(ownerId);
   } catch (e) {
-    res.status(400).json({ message : e });
+    res.status(400).json({ message: e });
     return;
-  }  
+  }
 
   const listingsFound = await listingsData.getListingByOwnerId(ownerId);
-    res.status(200).json(listingsFound);
+  res.status(200).json(listingsFound);
 });
