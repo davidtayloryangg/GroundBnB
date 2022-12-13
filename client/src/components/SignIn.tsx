@@ -15,8 +15,13 @@ function SignIn() {
 
     try {
       await doSignInWithEmailAndPassword(email.value, password.value);
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      console.log(error);
+      if (error.code === 'auth/wrong-password') {
+        alert('Wrong email or password');
+      } else if (error.code === 'auth/user-not-found') {
+        alert('Wrong email or password');
+      }
     }
   };
 

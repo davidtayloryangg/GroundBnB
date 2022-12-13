@@ -31,8 +31,13 @@ function SignUp() {
         passwordOne.value,
         firstName.value + ' ' + lastName.value
       );
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        alert('Email already in use');
+      } else if (error.code === 'auth/invalid-email') {
+        alert('Invalid email');
+      }
+
     }
   };
 
