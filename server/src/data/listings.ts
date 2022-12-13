@@ -158,7 +158,6 @@ export const createListing = async (
 export const getListings = async (pageNum: number, filterBy: string | null) => {
   let listingLimit: number = pageNum * itemsPerPage;
   let dbQuery;
-  console.log(filterBy);
   switch (filterBy) {
     case "rating-asc":
       dbQuery = query(
