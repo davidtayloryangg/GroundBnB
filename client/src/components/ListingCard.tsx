@@ -64,6 +64,7 @@ function ListingCard(props: any) {
           },
         }}
       >
+        {/* This is the image without the image gallery stuff */}
         {/* <CardMedia
           component="img"
           height="250"
@@ -79,7 +80,6 @@ function ListingCard(props: any) {
         <CardContent>
           <Stack sx={{ height: 330 }}>
             <div className="image-gallery-container">
-              {/* // <div> */}
               <ImageGallery
                 items={galleryImages}
                 infinite={true}

@@ -162,7 +162,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
   switch (filterBy) {
     case "rating-asc":
       console.log("fitered by rating asc");
-      // console.log(filterBy);
       dbQuery = query(
         collection,
         orderBy("averageRating"),
@@ -171,7 +170,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       break;
     case "rating-desc":
       console.log("fitered by rating desc");
-      // console.log(filterBy);
       dbQuery = query(
         collection,
         orderBy("averageRating", "desc"),
@@ -180,12 +178,10 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       break;
     case "price-asc":
       console.log("fitered by price asc");
-      // console.log(filterBy);
       dbQuery = query(collection, orderBy("price"), limit(listingLimit));
       break;
     case "price-desc":
       console.log("fitered by price desc");
-      // console.log(filterBy);
       dbQuery = query(
         collection,
         orderBy("price", "desc"),
@@ -201,11 +197,6 @@ export const getListings = async (pageNum: number, filterBy: string | null) => {
       );
       break;
   }
-  // const first = query(
-  //   collection,
-  //   orderBy("averageRating", "desc"),
-  //   limit(listingLimit)
-  // );
   const snapshot = await firestore.getCountFromServer(collection);
   let totalListingsCount: number = snapshot.data().count;
   const documentSnapshots = await getDocs(dbQuery);
