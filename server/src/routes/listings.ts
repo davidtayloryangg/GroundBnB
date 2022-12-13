@@ -130,7 +130,7 @@ listingRoutes.post('/create', upload.array('imageArray[]'), async (req: Request,
     validation.validateZip(zipcode);
     validation.validLatitude(lat);
     validation.validLongitude(lon);
-    validation.validUID(ownerId);
+    await validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
     return res.status(400).json({ message: e });
@@ -190,7 +190,7 @@ listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: 
     validation.validateZip(zipcode);
     validation.validLatitude(lat);
     validation.validLongitude(lon);
-    validation.validUID(ownerId);
+    await validation.validUID(ownerId);
     validation.validateImages(imageArray);
   } catch (e) {
     return res.status(400).json({ message: e })
