@@ -9,6 +9,7 @@ import {
     Typography,
     Button,
 } from "@mui/material";
+import axios from "axios";
 
 const libraries = ["places"];
 
@@ -23,10 +24,12 @@ const Search = () => {
       });
     const [address, setAddress] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [listings, setListings] = useState([]);
+    const [map, setMap] = useState(null);
 
     const handleChange = () => {
-    console.log("Hitting change", address, coordinates);
-    setSearchTerm(address);
+        console.log("Hitting change", address, coordinates);
+        setSearchTerm(address);
     };
     const handleSelect = async (value:any) => {
         const results = await geocodeByAddress(value);
@@ -34,6 +37,20 @@ const Search = () => {
         setAddress(value);
         setCoordinates(latLng);
     };
+
+    useEffect(() => {
+        const settingData = async () => {
+          const url = `http://localhost:4000/listings/search/location?lat=${coordinates.lat}&lon=${coordinates.lng}`;
+          const data = await axios.get(url);
+          console.log("Data", data.data);
+          setListings(data.data);
+          setSearchTerm("");
+          console.log(data.data);
+        };
+        if (searchTerm !== "") {
+          settingData();
+        }
+      }, [searchTerm, isLoaded]);
 
     if (!isLoaded) {
         return <div>Loading...</div>;
@@ -94,96 +111,96 @@ const Search = () => {
                     </PlacesAutocomplete>
                 </div>
                 <div className="mapContainer">
-        <h2>Listings && Map Container</h2>
-        <Grid container spacing={2}>
-          <Grid container item spacing={2} xs={12} sm={6}>
-            {listings?.map((item) => (
-              <Grid item xs={12} md={6} lg={4}>
-                <Card>
-                  {/* <AutoPlaySwipeableViews>
-                    {item.imagesUrls?.map((image) => (
-                      <div>
-                        <img src={image} alt="listing" />
-                      </div>
-                    ))}
-                  </AutoPlaySwipeableViews> */}
-                  {/* <img
-                    src={item.imagesUrls?.map((image) => image)}
-                    alt="Temp. Unavailable"
-                  /> */}
-                  <CardMedia
-                    component="img"
-                    alt="Temp. Unavailable"
-                    height="250"
-                    image={item.imagesUrls?.map((image) => image)}
-                  />
-                  <Typography variant="h6">
-                    {item.address.city}, {item.address.state}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.description}
-                  </Typography>
-                  <Grid container justify="space-between">
-                    <Grid item alignItems="left" xs={6}>
-                      <Typography inline variant="subtitle2" align="left">
-                        ${item.price}
-                      </Typography>
+                    <h2>Listings && Map Container</h2>
+                    <Grid container spacing={2}>
+                        <Grid container item spacing={2} xs={12} sm={6}>
+                            {listings?.map((item) => (
+                                <Grid item xs={12} md={6} lg={4}>
+                                    <Card>
+                                        {/* <AutoPlaySwipeableViews>
+                                            {item.imagesUrls?.map((image) => (
+                                            <div>
+                                                <img src={image} alt="listing" />
+                                            </div>
+                                            ))}
+                                        </AutoPlaySwipeableViews> */}
+                                        {/* <img
+                                            src={item.imagesUrls?.map((image) => image)}
+                                            alt="Temp. Unavailable"
+                                        /> */}
+                                        <CardMedia
+                                            component="img"
+                                            alt="Temp. Unavailable"
+                                            height="250"
+                                            image={item.imagesUrls?.map((image:any) => image)}
+                                        />
+                                        <Typography variant="h6">
+                                            {item.address.city}, {item.address.state}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {item.description}
+                                        </Typography>
+                                        <Grid container>
+                                            <Grid item alignItems="left" xs={6}>
+                                            <Typography variant="subtitle2" align="left">
+                                                ${item.price}
+                                            </Typography>
+                                            </Grid>
+                                            <Grid item alignItems="right" xs={6}>
+                                            <Typography variant="subtitle2" align="right">
+                                                ★
+                                                {item.averageRating % 1 === 0
+                                                ? item.averageRating
+                                                : item.averageRating.toFixed(1)}
+                                            </Typography>
+                                            </Grid>
+                                        </Grid>
+                                        <CardActions>
+                                            <Button
+                                            variant="contained"
+                                            href={`listing/${item.id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            >
+                                            Learn more
+                                            </Button>
+                                        </CardActions>
+                                    </Card>
+                                </Grid>
+                            ))}
+                            <Grid item xs={12} md={6} lg={4}>
+                            <Card>
+                                <p>Testing</p>
+                            </Card>
+                            </Grid>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <GoogleMap
+                            center={coordinates}
+                            zoom={10}
+                            mapContainerStyle={{ width: "100%", height: "95vh" }}
+                            options={{
+                                zoomControl: false,
+                                streetViewControl: false,
+                                mapTypeControl: false,
+                                fullscreenControl: false,
+                            }}
+                            onLoad={(map) => setMap(map)}
+                            >
+                            <MarkerF position={coordinates} />
+                            <MarkerF position={{ lat: 40.85936, lng: -74.18905 }} />
+                            {listings?.map((item) => (
+                                <MarkerF
+                                position={{
+                                    lat: parseFloat(item.address.geolocation.latitide),
+                                    lng: parseFloat(item.address.geolocation.longitude),
+                                }}
+                                />
+                            ))}
+                            </GoogleMap>
+                        </Grid>
                     </Grid>
-                    <Grid item alignItems="right" xs={6}>
-                      <Typography inline variant="subtitle2" align="right">
-                        ★
-                        {item.averageRating % 1 === 0
-                          ? item.averageRating
-                          : item.averageRating.toFixed(1)}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <CardActions>
-                    <Button
-                      variant="contained"
-                      href={`listing/${item.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Learn more
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-            <Grid item xs={12} md={6} lg={4}>
-              <Card>
-                <p>Testing</p>
-              </Card>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <GoogleMap
-              center={coordinates}
-              zoom={10}
-              mapContainerStyle={{ width: "100%", height: "95vh" }}
-              options={{
-                zoomControl: false,
-                streetViewControl: false,
-                mapTypeControl: false,
-                fullscreenControl: false,
-              }}
-              onLoad={(map) => setMap(map)}
-            >
-              <MarkerF position={coordinates} />
-              <MarkerF position={{ lat: 40.85936, lng: -74.18905 }} />
-              {listings?.map((item) => (
-                <MarkerF
-                  position={{
-                    lat: parseFloat(item.address.geolocation.latitide),
-                    lng: parseFloat(item.address.geolocation.longitude),
-                  }}
-                />
-              ))}
-            </GoogleMap>
-          </Grid>
-        </Grid>
-      </div>
+                </div>
             </div>
         )
     }
