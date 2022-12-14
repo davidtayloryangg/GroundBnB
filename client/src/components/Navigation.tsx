@@ -44,6 +44,9 @@ const Navigation = () => {
                 <Link className='link' to='/my-profile'>
                   <Button variant='contained' disableElevation>My Profile</Button>
                 </Link>
+                <Link className='link' to='/create-listing'>
+                  <Button variant='contained' disableElevation>Create Listing</Button>
+                </Link>
               </Stack>
               <Stack direction='row' spacing={0} justifyContent='flex-end'>
                 {currentUser ? (

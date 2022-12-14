@@ -11,6 +11,7 @@ import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Landing from './components/Landing';
 import SignOut from './components/SignOut';
+import CreateListing from './components/CreateListing';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/bookings" />
             <Route path="/listings" />
             <Route path="/my-profile" />
+            <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signout" element={<SignOut />} />
