@@ -10,6 +10,7 @@ import Navigation from './components/Navigation';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Landing from './components/Landing';
+import Search from './components/Search';
 
 export default function App() {
   return (
@@ -33,6 +34,9 @@ export default function App() {
                       </Link>
                       <Link className='link' to='/listings'>
                         <Button variant='contained' disableElevation>Listings</Button>
+                      </Link>
+                      <Link className='link' to='/search'>
+                        <Button variant='contained' disableElevation>Search</Button>
                       </Link>
                       <Link className='link' to='/bookings'>
                         <Button variant='contained' disableElevation>Bookings</Button>
@@ -63,6 +67,7 @@ export default function App() {
             <Route path="/my-profile" />
             <Route path="/login" />
             <Route path="/signup" />
+            <Route path="/search" element={<Search />} />
           </Routes>
         </div>
       </Router>
