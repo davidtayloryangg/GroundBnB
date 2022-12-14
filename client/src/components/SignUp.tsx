@@ -1,32 +1,48 @@
-import React, {useContext, useState} from 'react';
-import {Navigate} from 'react-router-dom';
-import {doCreateUserWithEmailAndPassword} from '../firebase/FirebaseFunctions';
-import {AuthContext} from '../firebase/Auth';
+import React, { useContext, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { doSignUpWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import { AuthContext } from '../firebase/Auth';
 import SocialSignIn from './SocialSignIn';
+import { emailFilter, stringFilter, isAtLeast13 } from '../Validation';
+
 function SignUp() {
-  const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const [pwMatch, setPwMatch] = useState('');
   const handleSignUp = async (e: any) => {
     e.preventDefault();
-    const {displayName, email, passwordOne, passwordTwo} = e.target.elements;
+    const { firstName, lastName, email, passwordOne, passwordTwo, birthdate } = e.target.elements;
     if (passwordOne.value !== passwordTwo.value) {
       setPwMatch('Passwords do not match');
       return false;
     }
 
+
     try {
-      await doCreateUserWithEmailAndPassword(
+      email.value = emailFilter(email.value);
+      passwordOne.value = stringFilter(passwordOne.value);
+      firstName.value = stringFilter(firstName.value);
+      lastName.value = stringFilter(lastName.value);
+      birthdate.value = stringFilter(birthdate.value);
+
+      isAtLeast13(new Date(birthdate.value));
+
+      await doSignUpWithEmailAndPassword(
         email.value,
         passwordOne.value,
-        displayName
+        firstName.value + ' ' + lastName.value
       );
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        alert('Email already in use');
+      } else if (error.code === 'auth/invalid-email') {
+        alert('Invalid email');
+      }
+
     }
   };
 
   if (currentUser) {
-    return <Navigate to='/home' />;
+    return <Navigate to='/' />;
   }
 
   return (
@@ -36,20 +52,33 @@ function SignUp() {
       <form onSubmit={handleSignUp}>
         <div className='form-group'>
           <label>
-            Name: 
+            First Name:
             <input
               className='form-control'
               required
-              name='displayName'
+              name='firstName'
               type='text'
               placeholder='Name'
             />
           </label>
         </div>
-        <br/>
+        <br />
         <div className='form-group'>
           <label>
-            Email: 
+            Last Name:
+            <input
+              className='form-control'
+              required
+              name='lastName'
+              type='text'
+              placeholder='Name'
+            />
+          </label>
+        </div>
+        <br />
+        <div className='form-group'>
+          <label>
+            Email:
             <input
               className='form-control'
               required
@@ -59,10 +88,24 @@ function SignUp() {
             />
           </label>
         </div>
-        <br/>
+        <br />
         <div className='form-group'>
           <label>
-            Password: 
+            Birthdate:
+            <input
+              className='form-control'
+              required
+              id="birthdate"
+              name='birthdate'
+              type='date'
+              placeholder='Birthdate'
+            />
+          </label>
+        </div>
+        <br />
+        <div className='form-group'>
+          <label>
+            Password:
             <input
               className='form-control'
               id='passwordOne'
@@ -74,10 +117,10 @@ function SignUp() {
             />
           </label>
         </div>
-        <br/>
+        <br />
         <div className='form-group'>
           <label>
-            Confirm Password: 
+            Confirm Password:
             <input
               className='form-control'
               name='passwordTwo'
@@ -88,13 +131,13 @@ function SignUp() {
             />
           </label>
         </div>
-        <br/>
+        <br />
         <button id='submitButton' name='submitButton' type='submit'>
           Sign Up
         </button>
       </form>
       <br />
-      <SocialSignIn />
+      <SocialSignIn type="signup" />
     </div>
   );
 }

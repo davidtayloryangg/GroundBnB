@@ -10,50 +10,14 @@ import Navigation from './components/Navigation';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Landing from './components/Landing';
+import SignOut from './components/SignOut';
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
         <div className='App'>
-          <header className='App-header'>
-            <AppBar position='static' sx={{ boxShadow: 'none'}}>
-              <Container maxWidth='xl'>
-                <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-                {/* <Stack direction='row' justifyContent='space-between'> */}
-                  <Stack direction='row' justifyContent='flex-start'>
-                      <Link className='link' to='/'>
-                        <Button variant='contained' startIcon={<DeckIcon />} disableElevation sx={{
-                            display: { xs: 'none', md: 'flex' },
-                            fontWeight: 700,
-                            letterSpacing: '.2rem',
-                            color: 'white',
-                            textDecoration: 'none',
-                          }}> GroundBnB</Button>
-                      </Link>
-                      <Link className='link' to='/listings'>
-                        <Button variant='contained' disableElevation>Listings</Button>
-                      </Link>
-                      <Link className='link' to='/bookings'>
-                        <Button variant='contained' disableElevation>Bookings</Button>
-                      </Link>
-                      <Link className='link' to='/my-profile'>
-                        <Button variant='contained' disableElevation>My Profile</Button>
-                      </Link>
-                    </Stack>
-                    <Stack direction='row' spacing={0} justifyContent='flex-end'>
-                      <Link className='link' to='/login'>
-                        <Button variant='contained' disableElevation>Log In</Button>
-                      </Link>
-                      <Link className='link' to='/signup'>
-                        <Button variant='contained' disableElevation>Sign Up</Button>
-                      </Link>
-                    </Stack>
-                  {/* </Stack> */}
-                </Toolbar>
-              </Container>
-            </AppBar>
-          </header>
+          <Navigation />
         </div>
         <div className='App-body'>
           <Routes>
@@ -61,8 +25,9 @@ export default function App() {
             <Route path="/bookings" />
             <Route path="/listings" />
             <Route path="/my-profile" />
-            <Route path="/login" />
-            <Route path="/signup" />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signout" element={<SignOut />} />
           </Routes>
         </div>
       </Router>
