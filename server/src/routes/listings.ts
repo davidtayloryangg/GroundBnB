@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as express from "express";
 import * as listingsData from "../data/listings";
+import * as bookingsData from "../data/bookings";
 import * as validation from "../validation";
 import * as xss from "xss";
 import * as multer from "multer";
@@ -84,6 +85,30 @@ listingRoutes.post(
       await validation.validUID(userId);
     } catch (e) {
       res.status(400).json({ message: e });
+      return;
+    }
+
+    const getUserBookings = await bookingsData.getUserBookingsForGivenListingId(userId, listingId);
+    if (getUserBookings.length === 0) {
+      res
+        .status(409)
+        .json({ message : 'User has not previously booked this listing'});
+      return;
+    }
+
+    let hasPreviouslyBooked = false;
+    getUserBookings.forEach((booking) => {
+      console.log(booking.startTimestamp.toDate().getTime());
+      console.log(new Date().getTime());
+      if (booking.startTimestamp.toDate().getTime() < new Date().getTime()) {
+        hasPreviouslyBooked = true;
+      }
+    });
+
+    if(!hasPreviouslyBooked) {
+      res
+        .status(409)
+        .json({ message : 'User has not previously booked this listing'});
       return;
     }
 

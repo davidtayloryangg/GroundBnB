@@ -94,3 +94,17 @@ export const createBooking = async (bookerId : string, listingId : string, numOf
   booking.bookingId = bookingAdded.id;
   return booking;
 };
+
+export const getUserBookingsForGivenListingId = async (bookerId : string, listingId : string) => {
+  const  query = firestore.query(collection, firestore.where('bookerId', '==', bookerId), firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE'));
+  const bookingsByUserForGivenListing = await firestore.getDocs(query);
+  const bookingsByUserForGivenListingFound = [];
+
+  if (!bookingsByUserForGivenListing.empty) {
+    bookingsByUserForGivenListing.forEach((booking) => {
+      bookingsByUserForGivenListingFound.push(booking.data());
+    });
+  }
+
+  return bookingsByUserForGivenListingFound;
+};
