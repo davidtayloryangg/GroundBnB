@@ -3,11 +3,19 @@ import * as express from "express";
 import * as listingsData from "../data/listings";
 import * as validation from "../validation";
 import * as xss from "xss";
+import * as multer from "multer";
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 export const listingRoutes = express.Router();
 import { getAllListings } from "../data";
 import * as distance from "geo-distance";
 
 listingRoutes.get("/page/:pagenum", async (req, res) => {
+  let filterByQueryParams = req.query.filterBy
+    ? new xss.FilterXSS().process(req.query.filterBy.toString()).trim()
+    : null;
   try {
     // Declares a variable named pageNum, sets it equal to req.params.pagenum, and trims req.params.pagenum
     let pageNum = Number(
@@ -19,7 +27,7 @@ listingRoutes.get("/page/:pagenum", async (req, res) => {
       return res.status(400).json({ error: "Invalid page number." });
     }
     // Gets listings
-    let listings = await listingsData.getListings(pageNum);
+    let listings = await listingsData.getListings(pageNum, filterByQueryParams);
     // Return the listings
     res.status(200).json(listings);
   } catch (e) {
@@ -123,22 +131,91 @@ listingRoutes.post(
   }
 );
 
+listingRoutes.post(
+  "/create",
+  upload.array("imageArray[]"),
+  async (req: Request, res: Response) => {
+    console.log("POST /listings/create");
+    const description = new xss.FilterXSS()
+      .process(req.body.description)
+      .trim();
+    const price = parseFloat(req.body.price);
+    const street = new xss.FilterXSS().process(req.body.street).trim();
+    const city = new xss.FilterXSS().process(req.body.city).trim();
+    const state = new xss.FilterXSS().process(req.body.state).trim();
+    const zipcode = new xss.FilterXSS().process(req.body.zipcode).trim();
+    const lat = parseFloat(req.body.lat);
+    const lon = parseFloat(req.body.lon);
+    const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
+    const imageArray = req.files;
+
+    try {
+      validation.validString(description);
+      validation.validPrice(price);
+      validation.validString(street);
+      validation.validateCity(city);
+      validation.validateState(state);
+      validation.validateZip(zipcode);
+      validation.validUID(ownerId);
+      validation.validateImages(imageArray);
+    } catch (e) {
+      return res.status(400).json({ message: e });
+    }
+
+    try {
+      // data function call
+      const newListingId = await listingsData.createListing(
+        description,
+        price,
+        street,
+        city,
+        state,
+        zipcode,
+        lat,
+        lon,
+        ownerId,
+        imageArray
+      );
+      const newListing = await listingsData.getListing(newListingId);
+      return res
+        .status(200)
+        .json({ message: "Listing added successfully", listing: newListing });
+    } catch (e) {
+      return res.status(500).json({ message: e });
+    }
+  }
+);
+
 listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
   const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
 
   try {
     validation.validString(listingId);
   } catch (e) {
-    res.status(400).json({ message : e});
+    res.status(400).json({ message: e });
     return;
   }
 
   const listingFound = await listingsData.getListing(listingId);
 
-  if(listingFound === null) {
-    res.status(404).json({ message : 'Listing not found'});
+  if (listingFound === null) {
+    res.status(404).json({ message: "Listing not found" });
     return;
-  } 
+  }
 
   res.status(200).json(listingFound);
+});
+
+listingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
+  const ownerId = new xss.FilterXSS().process(req.params.ownerId).trim();
+
+  try {
+    await validation.validUID(ownerId);
+  } catch (e) {
+    res.status(400).json({ message: e });
+    return;
+  }
+
+  const listingsFound = await listingsData.getListingByOwnerId(ownerId);
+  res.status(200).json(listingsFound);
 });

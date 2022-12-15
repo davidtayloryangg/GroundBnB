@@ -1,22 +1,27 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import SocialSignIn from './SocialSignIn';
-import {Navigate} from 'react-router-dom';
-import {AuthContext} from '../firebase/Auth';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../firebase/Auth';
 import {
   doSignInWithEmailAndPassword,
   doPasswordReset,
 } from '../firebase/FirebaseFunctions';
 
 function SignIn() {
-    const {currentUser} = useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const handleLogin = async (event: any) => {
     event.preventDefault();
-    let {email, password} = event.target.elements;
+    let { email, password } = event.target.elements;
 
     try {
       await doSignInWithEmailAndPassword(email.value, password.value);
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      console.log(error);
+      if (error.code === 'auth/wrong-password') {
+        alert('Wrong email or password');
+      } else if (error.code === 'auth/user-not-found') {
+        alert('Wrong email or password');
+      }
     }
   };
 
@@ -33,7 +38,7 @@ function SignIn() {
     }
   };
   if (currentUser) {
-    return <Navigate to='/home' />;
+    return <Navigate to='/' />;
   }
   return (
     <div>
@@ -75,7 +80,7 @@ function SignIn() {
       </form>
 
       <br />
-      <SocialSignIn />
+      <SocialSignIn type='signin' />
     </div>
   );
 }

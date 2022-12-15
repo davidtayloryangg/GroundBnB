@@ -1,5 +1,4 @@
-const db = require("./firebase/config").db;
-import { doc, getDoc } from "firebase/firestore";
+import xss from "xss";
 
 function validString(str: string): void {
   // Checks if str is a string
@@ -13,11 +12,6 @@ function validNumber(num: Number): void {
   if (typeof num !== "number") throw `${num} is not a number.`;
   // Checks if num is an integer
   if (!Number.isInteger(num)) throw "Invalid number.";
-}
-
-function validPrice(num: Number): void {
-  // Checks if num is a number
-  if (typeof num !== "number") throw `${num} is not a valid price.`;
 }
 
 function validEmail(email: string): void {
@@ -58,35 +52,6 @@ function validRating(rating: Number): void {
   if (!Number.isInteger(rating)) throw "Invalid rating.";
   // Checks if rating is between 1 and 5
   if (rating < 1 || rating > 5) throw "Invalid rating.";
-}
-
-async function validUID(uid: string): Promise<void> {
-  // Checks if uid is a string
-  if (typeof uid !== "string") throw `${uid} is not a string.`;
-  // Checks if UID contains spaces
-  if (/\s/g.test(uid)) throw "Invalid UID";
-  // Gets the user document
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  // Checks if doc is undefined
-  if (!userSnap.exists()) throw "Invalid UID";
-}
-
-function validFile(multerFile): void {
-  // Check if valid jpeg file
-  if (multerFile.mimetype !== "image/jpeg") throw "Image must be a jpeg file";
-}
-
-async function validListingId(listingId: string): Promise<void> {
-  // Checks if listingId is a string
-  if (typeof listingId !== "string") throw `${listingId} is not a string`;
-  // Checks if listingId contains spaces
-  if (/\s/g.test(listingId)) throw "Invalid listingId";
-  // Gets the listing document
-  const listingRef = doc(db, "listings", listingId);
-  const listingSnap = await getDoc(listingRef);
-  // Checks if doc is undefined
-  if (!listingSnap.exists()) throw "Invalid listingId";
 }
 
 function validateCity(city: string) {
@@ -177,13 +142,6 @@ function validateZip(zip: string) {
   if (!/^\d+$/.test(zip)) throw "Invalid zip.";
 }
 
-function validateImages(imageArray): void {
-  if (imageArray.length <= 0) throw "At least one image needs to be submitted";
-  for (let i = 0; i < imageArray.length; i++) {
-    this.validFile(imageArray[i]);
-  }
-}
-
 function validateReview(text: string, date: string, rating: Number) {
   validDate(date);
   validRating(rating);
@@ -197,8 +155,25 @@ function validNumOfPeople(numOfPeople: Number) {
   if (!Number.isInteger(numOfPeople)) throw "Invalid number of people.";
 }
 
+function isAtLeast13(dob: Date) {
+  var today = new Date();
+
+  var age = today.getFullYear() - dob.getFullYear();
+  if (
+    dob.getMonth() > today.getMonth() ||
+    (dob.getMonth() === today.getMonth() && dob.getDate() > today.getDate())
+  ) {
+    age--;
+  }
+
+  if (age < 13) {
+    throw "You must be at least 13 years old to use this service.";
+  }
+}
+
 function stringFilter(str: string) {
   validString(str);
+  str = xss(str);
   str = str.trim();
   return str;
 }
@@ -211,20 +186,16 @@ function emailFilter(email: string) {
 export {
   validString,
   validNumber,
-  validPrice,
   validEmail,
   validDate,
   validTime,
   validRating,
-  validUID,
-  validFile,
   validateCity,
   validateState,
   validateZip,
   validateReview,
-  validateImages,
-  validListingId,
   validNumOfPeople,
+  isAtLeast13,
   stringFilter,
   emailFilter,
 };
