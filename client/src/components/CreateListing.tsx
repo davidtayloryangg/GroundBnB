@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { useDropzone } from 'react-dropzone';
 
 export default function CreateListing() {
@@ -11,7 +10,7 @@ export default function CreateListing() {
   const [zipcode, setZipcode] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: { 'image/jpeg': ['.jpeg', '.jpg'] } });
 
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
@@ -21,48 +20,117 @@ export default function CreateListing() {
   const [priceError, setPriceError] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);
-  }
+  };
 
   const handleCityChange = (e: any) => {
     setCity(e.target.value);
-  }
+  };
 
   const handleStateChange = (e: any) => {
     setState(e.target.value);
-  }
+  };
 
   const handleZipcodeChange = (e: any) => {
     setZipcode(e.target.value);
-  }
+  };
 
   const handleDescriptionChange = (e: any) => {
     setDescription(e.target.value);
-  }
+  };
 
   const handlePriceChange = (e: any) => {
     setPrice(e.target.value);
+  };
+
+  const checkForErrors = () => {
+    let errors = false;
+    if (street.trim().length === 0) {
+      errors = true;
+      setStreetError(true);
+    }
+    if (city.trim().length === 0) {
+      errors = true;
+      setCityError(true);
+    }
+    if (state.trim().length === 0) {
+      errors = true;
+      setStateError(true);
+    }
+    if (zipcode.trim().length === 0 || zipcode.trim().length !== 5 || !/^\d+$/.test(zipcode)) {
+      errors = true;
+      setZipcodeError(true);
+    }
+    if (description.trim().length === 0) {
+      errors = true;
+      setDescriptionError(true);
+    }
+    if (price.trim().length === 0 || !/^\d+$/.test(price)) {
+      errors = true;
+      setPriceError(true);
+    }
+    if (acceptedFiles.length === 0) {
+      errors = true;
+      setImageError(true);
+    }
+    return errors
+  };
+
+  const doCreateListing = async (description: String, price: String, street: String, city: String, state: String, zipcode: String, imageArray: Array<File>) => {
+    // Need to get lat/lon
+    // Need to call post route
   }
-    
+
+  const imagesList = acceptedFiles.map((file, index) => {
+    return <li key={index}>{file.name}</li>
+  });
+
   return (
     <div>
       <br />
       <Typography variant='h3' component='div'>Create Listing</Typography>
       <br />
-      <form>
+      <form
+        id='create-listing-form'
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setStreetError(false);
+          setCityError(false);
+          setStateError(false);
+          setZipcodeError(false);
+          setDescriptionError(false);
+          setPriceError(false);
+          setImageError(false);
+
+          const errors = checkForErrors();
+          if (!errors) {
+            try {
+              await doCreateListing(description, price, street, city, state, zipcode, acceptedFiles);
+            } catch (e) {
+
+            }
+          }
+
+        }}>
         <Stack direction='row' spacing={1} justifyContent='space-evenly'>
           <Stack direction='column'>
-            <div {...getRootProps({className: 'dropzone'})}>
+            <div className='image-dropzone-area' {...getRootProps({className: 'dropzone image-dropzone-area'})}>
               <input {...getInputProps()} />
               <p>Drag 'n' drop some images here, or click to select images</p>
             </div>
+            <div>
+              <p className='error'>{imageError ? 'Must select at least one image' : ''}</p>
+              <p>Files:</p>
+              <ul>
+                {imagesList}
+              </ul>
+            </div>
           </Stack>
           <Stack direction='column' spacing={2}>
-            <TextField variant='filled' label='Street' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
-            <TextField variant='filled' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={cityError} helperText={cityError ? 'Invalid Input' : null} required fullWidth />
-            <TextField select variant='filled' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={stateError} helperText={stateError ? 'Invalid Input' : null} required fullWidth>
+            <TextField variant='outlined' label='Street' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
+            <TextField variant='outlined' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={cityError} helperText={cityError ? 'Invalid Input' : null} required fullWidth />
+            <TextField select variant='outlined' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={stateError} helperText={stateError ? 'Invalid Input' : null} required fullWidth>
               <MenuItem value='AL'>AL</MenuItem>
               <MenuItem value='AK'>AK</MenuItem>
               <MenuItem value='AZ'>AZ</MenuItem>
@@ -115,12 +183,12 @@ export default function CreateListing() {
               <MenuItem value='WI'>WI</MenuItem>
               <MenuItem value='WY'>WY</MenuItem>
             </TextField>
-            <TextField variant='filled' label='Zip Code' id='zipcode' name='zipcode' value={zipcode} onChange={handleZipcodeChange} size='small' error={zipcodeError} helperText={zipcodeError ? 'Invalid Input' : null} required fullWidth />
-            <TextField multiline rows={3} variant='filled' label='Description' id='description' name='description' value={description} onChange={handleDescriptionChange} size='small' error={descriptionError} helperText={descriptionError ? 'Invalid Input' : null} required fullWidth />
-            <TextField variant='filled' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} required fullWidth />
+            <TextField variant='outlined' label='Zip Code' id='zipcode' name='zipcode' value={zipcode} onChange={handleZipcodeChange} size='small' error={zipcodeError} helperText={zipcodeError ? 'Invalid Input' : null} required fullWidth />
+            <TextField multiline rows={3} variant='outlined' label='Description' id='description' name='description' value={description} onChange={handleDescriptionChange} size='small' error={descriptionError} helperText={descriptionError ? 'Invalid Input' : null} required fullWidth />
+            <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth />
           </Stack>
         </Stack>
-        <Button variant='contained' type='submit' disableElevation>Save</Button>
+        <Button variant='contained' type='submit' disableElevation sx={{width: '150px'}}>Save</Button>
       </form>
     </div>
   )
