@@ -1,22 +1,37 @@
-import React from 'react';
-import {doSocialSignIn} from '../firebase/FirebaseFunctions';
+import { doSocialSignIn, doSocialSignUp } from '../firebase/FirebaseFunctions';
+import '../App.css';
 
-const SocialSignIn = () => {
+const SocialSignIn = (props: any) => {
   const socialSignOn = async (provider: string) => {
     try {
-      await doSocialSignIn(provider);
-    } catch (error) {
+      doSocialSignUp(provider);
+    }
+    catch (error) {
       alert(error);
     }
   };
   return (
     <div>
-      <img 
-        className='social-signin'
-        onClick={() => socialSignOn('google')}
-        alt='google signin'
-        src='/imgs/btn_google_signin.png'
-      />
+      {props.type === 'signin' && (
+        <div>
+          <img
+            className='social-signin'
+            onClick={() => socialSignOn('google')}
+            alt='google signin'
+            src='/imgs/btn_google_signin.png'
+          />
+        </div>
+      )}
+      {props.type === 'signup' && (
+        <div>
+          <img
+            className='sign-up-img'
+            onClick={() => socialSignOn('google')}
+            alt='google signup'
+            src='/imgs/btn_google_signin.png'
+          />
+        </div>
+      )}
     </div>
   );
 };
