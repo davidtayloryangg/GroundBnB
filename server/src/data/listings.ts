@@ -15,9 +15,10 @@ export const getAllListings = async () => {
       id: doc.id,
       description: data.description,
       address: data.address,
+      averageRating: data.averageRating,
       imagesUrls: data.imageUrls,
-      ownerId: data.owner,
-      numberOfBookings: data.numberOfBookings,
+      ownerId: data.ownerId,
+      price: data.price,
       reviews: data.reviews,
     };
   });

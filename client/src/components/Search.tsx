@@ -8,10 +8,12 @@ import {
     CardActions,
     Typography,
     Button,
+    List,
 } from "@mui/material";
 import axios from "axios";
 
 const libraries = ["places"];
+const cardStyles = { };
 
 const Search = () => {
     const { isLoaded } = useJsApiLoader({
@@ -25,7 +27,10 @@ const Search = () => {
     const [address, setAddress] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [listings, setListings] = useState([]);
+    const [listingPage, setListingPage] = useState([]);
     const [map, setMap] = useState(null);
+    const [lastCardIndex, setLastIndexCard] = useState(1);
+    const [page, setPage] = useState(1);
 
     const handleChange = () => {
         console.log("Hitting change", address, coordinates);
@@ -40,17 +45,29 @@ const Search = () => {
 
     useEffect(() => {
         const settingData = async () => {
-          const url = `http://localhost:4000/listings/search/location?lat=${coordinates.lat}&lon=${coordinates.lng}`;
+          const url = `http://localhost:4000/listings/search/location/${page}?lat=${coordinates.lat}&lon=${coordinates.lng}`;
           const data = await axios.get(url);
           console.log("Data", data.data);
           setListings(data.data);
           setSearchTerm("");
-          console.log(data.data);
+
         };
         if (searchTerm !== "") {
           settingData();
         }
-      }, [searchTerm, isLoaded]);
+    }, [searchTerm, page]);
+
+    useEffect(() => {
+        const initLoad = async () => {
+            const url = `http://localhost:4000/listings/search/location/1?lat=${coordinates.lat}&lon=${coordinates.lng}`;
+            const data = await axios.get(url);
+            setListings(data.data);
+            console.log(data.data.length);
+            console.log(data.data.slice(0, 9));
+            setListingPage(data.data.slice(0, 9));
+        };
+        initLoad();
+    }, []);
 
     if (!isLoaded) {
         return <div>Loading...</div>;
@@ -112,11 +129,14 @@ const Search = () => {
                 </div>
                 <div className="mapContainer">
                     <h2>Listings && Map Container</h2>
+                    {/* <button onClick={setPage(page + 1)}>Next Page</button>
+                    <button onClick={setPage(page - 1)}>Previous Page</button> */}
                     <Grid container spacing={2}>
                         <Grid container item spacing={2} xs={12} sm={6}>
-                            {listings?.map((item) => (
+                        {/* <List style={{maxHeight: 1200, width:"100%", overflow: 'auto'}}> */}
+                            {listings?.map((item,index) => (
                                 <Grid item xs={12} md={6} lg={4}>
-                                    <Card>
+                                    <Card style={cardStyles}>
                                         {/* <AutoPlaySwipeableViews>
                                             {item.imagesUrls?.map((image) => (
                                             <div>
@@ -168,11 +188,12 @@ const Search = () => {
                                     </Card>
                                 </Grid>
                             ))}
-                            <Grid item xs={12} md={6} lg={4}>
+                            {/* <Grid item xs={12} md={6} lg={4}>
                             <Card>
                                 <p>Testing</p>
                             </Card>
                             </Grid>
+                            </List> */}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <GoogleMap
@@ -188,12 +209,11 @@ const Search = () => {
                             onLoad={(map) => setMap(map)}
                             >
                             <MarkerF position={coordinates} />
-                            <MarkerF position={{ lat: 40.85936, lng: -74.18905 }} />
                             {listings?.map((item) => (
                                 <MarkerF
                                 position={{
-                                    lat: parseFloat(item.address.geolocation.latitide),
-                                    lng: parseFloat(item.address.geolocation.longitude),
+                                    lat: item.address.geolocation.latitude,
+                                    lng: item.address.geolocation.longitude,
                                 }}
                                 />
                             ))}

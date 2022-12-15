@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { routes } from './routes';
+const cors = require('cors');
 
 let totalRequest: number = 0;
 let dict: object = {};
@@ -23,6 +24,7 @@ class App {
     }
 
     private config(): void {
+        this.app.use(cors({origin: 'http://localhost:3000'}));
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: false }));
         this.app.use(this.Logger);

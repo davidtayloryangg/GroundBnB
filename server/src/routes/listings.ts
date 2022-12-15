@@ -36,8 +36,17 @@ listingRoutes.get("/page/:pagenum", async (req, res) => {
 /**Getting listing and sorting from closest to furthest
  * Client send request to /search/location?lat=xxxx&lon=xxx
  */
-listingRoutes.get("/search/location", async (req: Request, res: Response) => {
+listingRoutes.get("/search/location/:pagenum", async (req: Request, res: Response) => {
   console.log("GET /listings/search/location");
+  console.log(req.params.pagenum);
+  
+  let pageNum = Number(
+    new xss.FilterXSS().process(req.params.pagenum).trim()
+  );
+  if (pageNum < 0 || isNaN(pageNum)) {
+    // Returns status code 400 with the error
+    return res.status(400).json({ error: "Invalid page number." });
+  }
   const location = {
     lat: parseFloat(req.query.lat.toString()),
     lon: parseFloat(req.query.lon.toString()),
@@ -58,7 +67,15 @@ listingRoutes.get("/search/location", async (req: Request, res: Response) => {
       .human_readable().distance;
     return aDistance - bDistance;
   });
-  res.json(sortedListings);
+  if (sortedListings.length < pageNum * 9) {
+    if (sortedListings.length < (pageNum - 1) * 9) {
+      res.json([])
+    } else {
+      res.json(sortedListings.slice((pageNum-1) * 9, sortedListings.length));
+    }
+  } else {
+    res.json(sortedListings.slice((pageNum-1) * 9, (pageNum*9)));
+  }
 });
 
 listingRoutes.post(
