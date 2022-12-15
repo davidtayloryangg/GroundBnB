@@ -45,7 +45,7 @@ bookingRoutes.get("/all", async (req: Request, res: Response) => {
 
   if (bookings === null) {
     res.status(200).json([]);
-  } 
+  }
 
   res.status(200).json(bookings);
 });
@@ -57,8 +57,8 @@ bookingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
 
   try {
     await validation.validUID(ownerId);
-  } catch (e) { 
-    res.status(400).json({ message : e });
+  } catch (e) {
+    res.status(400).json({ message: e });
     return;
   }
 
@@ -73,8 +73,8 @@ bookingRoutes.get("/booker/:bookerId", async (req: Request, res: Response) => {
 
   try {
     await validation.validUID(bookerId);
-  } catch (e) { 
-    res.status(400).json({ message : e });
+  } catch (e) {
+    res.status(400).json({ message: e });
     return;
   }
 
@@ -82,33 +82,50 @@ bookingRoutes.get("/booker/:bookerId", async (req: Request, res: Response) => {
   res.status(200).json(bookings);
 });
 
-bookingRoutes.get("/listing/:listingId", async (req: Request, res: Response) => {
-  console.log("GET /bookings/listing/:listingId");
+bookingRoutes.get(
+  "/listing/:listingId",
+  async (req: Request, res: Response) => {
+    console.log("GET /bookings/listing/:listingId");
 
-  const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
+    const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
 
-  try {
-    await validation.validListingId(listingId);
-  } catch (e) { 
-    res.status(400).json({ message : e });
-    return;
+    try {
+      await validation.validListingId(listingId);
+    } catch (e) {
+      res.status(400).json({ message: e });
+      return;
+    }
+
+    let excludeCanceledQueryParams = req.query.excludeCanceled
+      ? new xss.FilterXSS().process(req.query.excludeCanceled.toString()).trim()
+      : undefined;
+    let excludeCanceled =
+      excludeCanceledQueryParams && excludeCanceledQueryParams === "true"
+        ? true
+        : false;
+
+    const bookings = await bookingsData.getBookingsByListingId(
+      listingId,
+      excludeCanceled
+    );
+    res.status(200).json(bookings);
   }
-
-  let excludeCanceledQueryParams = (req.query.excludeCanceled) ? new xss.FilterXSS().process(req.query.excludeCanceled.toString()).trim() : undefined;
-  let excludeCanceled = (excludeCanceledQueryParams && excludeCanceledQueryParams === 'true') ? true : false;
-
-  const bookings = await bookingsData.getBookingsByListingId(listingId, excludeCanceled);
-  res.status(200).json(bookings);
-});
+);
 
 bookingRoutes.post("/create", async (req: Request, res: Response) => {
   console.log("POST /bookings/create");
 
   const bookerId = new xss.FilterXSS().process(req.body.bookerId).trim();
   const listingId = new xss.FilterXSS().process(req.body.listingId).trim();
-  const numOfPeople = parseInt(new xss.FilterXSS().process(req.body.numOfPeople).trim());
-  const endTimestamp = new xss.FilterXSS().process(req.body.endTimestamp).trim();
-  const startTimestamp = new xss.FilterXSS().process(req.body.startTimestamp).trim();
+  const numOfPeople = parseInt(
+    new xss.FilterXSS().process(req.body.numOfPeople).trim()
+  );
+  const endTimestamp = new xss.FilterXSS()
+    .process(req.body.endTimestamp)
+    .trim();
+  const startTimestamp = new xss.FilterXSS()
+    .process(req.body.startTimestamp)
+    .trim();
 
   try {
     validation.validNumOfPeople(numOfPeople);
@@ -117,7 +134,7 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
     await validation.validUID(bookerId);
     await validation.validListingId(listingId);
   } catch (e) {
-    res.status(400).json({ message : e});
+    res.status(400).json({ message: e });
     return;
   }
 
@@ -125,12 +142,12 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   const listingFound = await listingsData.getListing(listingId);
 
   if (listingFound === null) {
-    res.status(404).json({ message : 'Listing not found'});
+    res.status(404).json({ message: "Listing not found" });
     return;
   }
 
   if (listingFound.ownerId === bookerId) {
-    res.status(409).json({ message : 'Owner cannot book their own listing'});
+    res.status(409).json({ message: "Owner cannot book their own listing" });
     return;
   }
 
@@ -138,14 +155,29 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   const endDate = new Date(endTimestamp);
   const today = new Date();
 
-  const startDateJustDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const endDateJustDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  const startDateJustDate = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    startDate.getDate()
+  );
+  const endDateJustDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    endDate.getDate()
+  );
 
   if (endDateJustDate < startDateJustDate) {
-    res.status(400).json({ message : 'Booking starting time cannot be greater than booking end time'});
+    res.status(400).json({
+      message: "Booking starting time cannot be greater than booking end time",
+    });
     return;
-  } else if (startDateJustDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-    res.status(400).json({ message : 'Booking starting time cannot be less than todays date'});
+  } else if (
+    startDateJustDate <
+    new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  ) {
+    res.status(400).json({
+      message: "Booking starting time cannot be less than todays date",
+    });
     return;
   }
 
@@ -153,25 +185,50 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
   const futureBookingsForListing = [];
   const bookings = await bookingsData.getBookingsByListingId(listingId, true);
   bookings.forEach((booking) => {
-    const startDateJustDate = new Date(booking.startTimestamp.toDate().getFullYear(), booking.startTimestamp.toDate().getMonth(), booking.startTimestamp.toDate().getDate());
-    const endDateJustDate = new Date(booking.endTimestamp.toDate().getFullYear(), booking.endTimestamp.toDate().getMonth(), booking.endTimestamp.toDate().getDate());
+    const startDateJustDate = new Date(
+      booking.startTimestamp.toDate().getFullYear(),
+      booking.startTimestamp.toDate().getMonth(),
+      booking.startTimestamp.toDate().getDate()
+    );
+    const endDateJustDate = new Date(
+      booking.endTimestamp.toDate().getFullYear(),
+      booking.endTimestamp.toDate().getMonth(),
+      booking.endTimestamp.toDate().getDate()
+    );
 
-    if (endDateJustDate > new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-      let isUnique = futureBookingsForListing.find(date => date.getTime() === startDateJustDate.getTime());
+    if (
+      endDateJustDate >
+      new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    ) {
+      let isUnique = futureBookingsForListing.find(
+        (date) => date.getTime() === startDateJustDate.getTime()
+      );
 
-      if(!isUnique) {
+      if (!isUnique) {
         futureBookingsForListing.push(startDateJustDate);
       } else if (futureBookingsForListing.length === 0) {
         futureBookingsForListing.push(startDateJustDate);
       }
 
-      let nextDateJustTime = new Date(startDateJustDate.getFullYear(), startDateJustDate.getMonth(), startDateJustDate.getDate());
+      let nextDateJustTime = new Date(
+        startDateJustDate.getFullYear(),
+        startDateJustDate.getMonth(),
+        startDateJustDate.getDate()
+      );
       while (endDateJustDate.getTime() > nextDateJustTime.getTime()) {
         nextDateJustTime.setDate(nextDateJustTime.getDate() + 1);
-        let isUnique = futureBookingsForListing.find(date => date.getTime() === nextDateJustTime.getTime());
-        
-        if(!isUnique){
-          futureBookingsForListing.push(new Date(nextDateJustTime.getFullYear(), nextDateJustTime.getMonth(), nextDateJustTime.getDate())); 
+        let isUnique = futureBookingsForListing.find(
+          (date) => date.getTime() === nextDateJustTime.getTime()
+        );
+
+        if (!isUnique) {
+          futureBookingsForListing.push(
+            new Date(
+              nextDateJustTime.getFullYear(),
+              nextDateJustTime.getMonth(),
+              nextDateJustTime.getDate()
+            )
+          );
         }
       }
     }
@@ -179,13 +236,25 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
 
   // get all dates wanting to be booked
   let datesTryingToBook = [startDateJustDate];
-  let nextDateJustDate = new Date(startDateJustDate.getFullYear(), startDateJustDate.getMonth(), startDateJustDate.getDate());
+  let nextDateJustDate = new Date(
+    startDateJustDate.getFullYear(),
+    startDateJustDate.getMonth(),
+    startDateJustDate.getDate()
+  );
   while (endDateJustDate.getTime() > nextDateJustDate.getTime()) {
     nextDateJustDate.setDate(nextDateJustDate.getDate() + 1);
-    let isUnique = datesTryingToBook.find(date => date.getTime() === nextDateJustDate.getTime());
+    let isUnique = datesTryingToBook.find(
+      (date) => date.getTime() === nextDateJustDate.getTime()
+    );
 
     if (!isUnique) {
-      datesTryingToBook.push(new Date(nextDateJustDate.getFullYear(), nextDateJustDate.getMonth(), nextDateJustDate.getDate()));
+      datesTryingToBook.push(
+        new Date(
+          nextDateJustDate.getFullYear(),
+          nextDateJustDate.getMonth(),
+          nextDateJustDate.getDate()
+        )
+      );
     }
   }
 
@@ -194,17 +263,27 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
     datesTryingToBook.forEach((date) => {
       futureBookingsForListing.forEach((futureBooking) => {
         if (date.getTime() === futureBooking.getTime()) {
-          throw 'Dates to be book conflict';
+          throw "Dates to be book conflict";
         }
       });
     });
   } catch (e) {
-    res.status(409).json({ message : e});
+    res.status(409).json({ message: e });
     return;
   }
-  
 
-  const diffInDays = Math.round((endDateJustDate.getTime() - startDateJustDate.getTime()) / (1000 * 60 * 60 * 24));
-  const booking = await bookingsData.createBooking(bookerId, listingId, numOfPeople, listingFound.ownerId, (listingFound.price * (diffInDays + 1)), endDateJustDate.toString(), startDateJustDate.toString());
+  const diffInDays = Math.round(
+    (endDateJustDate.getTime() - startDateJustDate.getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+  const booking = await bookingsData.createBooking(
+    bookerId,
+    listingId,
+    numOfPeople,
+    listingFound.ownerId,
+    listingFound.price * (diffInDays + 1),
+    endDateJustDate.toString(),
+    startDateJustDate.toString()
+  );
   res.status(200).json(booking);
 });
