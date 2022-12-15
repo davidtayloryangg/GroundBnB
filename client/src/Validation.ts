@@ -178,6 +178,12 @@ function stringFilter(str: string) {
   return str;
 }
 
+function reviewFilter(str: string) {
+  validString(str);
+  str = xss(str);
+  return str;
+}
+
 function emailFilter(email: string) {
   validEmail(email);
   return stringFilter(email);
@@ -198,4 +204,5 @@ export {
   isAtLeast13,
   stringFilter,
   emailFilter,
+  reviewFilter
 };
