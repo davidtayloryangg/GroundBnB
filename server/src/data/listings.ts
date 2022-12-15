@@ -10,8 +10,7 @@ import * as im from "imagemagick";
 import * as fs from "fs";
 import * as path from "path";
 
-const itemsPerPage = 10;
-
+const itemsPerPage = 9;
 
 export const getAllListings = async () => {
   const querySnapshot = await firestore.getDocs(collection);
@@ -41,7 +40,10 @@ export const getListing = async (listingId: string) => {
 };
 
 export const getListingByOwnerId = async (ownerId: string) => {
-  const query = firestore.query(collection, firestore.where('ownerId', '==', ownerId));
+  const query = firestore.query(
+    collection,
+    firestore.where("ownerId", "==", ownerId)
+  );
   const listingsByOwnerId = await firestore.getDocs(query);
   const listingsFoundForOwner = [];
 
@@ -61,7 +63,7 @@ const cropImage = (image) => {
         srcPath: image.path,
         dstPath: `uploads-imagemagick/${image.filename}.jpg`,
         width: 500,
-        height: 500
+        height: 500,
       },
       (err, stdout) => {
         if (err) reject(err);
@@ -129,7 +131,7 @@ export const createListing = async (description: String, price: Number, street: 
         ).then((url) => imageUrls.push(url));
       })
       .catch((e) => console.log(e));
-    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+    fs.unlinkSync(path.resolve(__dirname, "../../" + imageArray[i].path));
     fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
   }
   // update listing with the image urls and listingId
@@ -220,16 +222,45 @@ export const editListing = async (listingId: string, description: String, price:
   return listingId;
 }
 
-export const getListings = async (pageNum: number) => {
+export const getListings = async (pageNum: number, filterBy: string | null) => {
   let listingLimit: number = pageNum * itemsPerPage;
-  const first = query(
-    collection,
-    orderBy("averageRating"),
-    limit(listingLimit)
-  );
+  let dbQuery;
+  switch (filterBy) {
+    case "rating-asc":
+      dbQuery = query(
+        collection,
+        orderBy("averageRating"),
+        limit(listingLimit)
+      );
+      break;
+    case "rating-desc":
+      dbQuery = query(
+        collection,
+        orderBy("averageRating", "desc"),
+        limit(listingLimit)
+      );
+      break;
+    case "price-asc":
+      dbQuery = query(collection, orderBy("price"), limit(listingLimit));
+      break;
+    case "price-desc":
+      dbQuery = query(
+        collection,
+        orderBy("price", "desc"),
+        limit(listingLimit)
+      );
+      break;
+    default:
+      dbQuery = query(
+        collection,
+        orderBy("averageRating", "desc"),
+        limit(listingLimit)
+      );
+      break;
+  }
   const snapshot = await firestore.getCountFromServer(collection);
   let totalListingsCount: number = snapshot.data().count;
-  const documentSnapshots = await getDocs(first);
+  const documentSnapshots = await getDocs(dbQuery);
   let docsReturnedCount: number = documentSnapshots.size;
   if (listingLimit - 10 > docsReturnedCount) {
     let returnObj = {
@@ -249,8 +280,8 @@ export const getListings = async (pageNum: number) => {
   listingsDoc.forEach((doc) => {
     listings.push(doc.data());
   });
-  let nextURL: string =
-    totalListingsCount === docsReturnedCount ? null : `${pageNum + 1}`;
+  let nextURL: number =
+    totalListingsCount === docsReturnedCount ? null : pageNum + 1;
   let returnObj = {
     next: nextURL,
     data: listings,
