@@ -10,10 +10,17 @@ export default function CreateListing() {
   const [state, setState] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState('');
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone();
 
-  const [addressError, setAddressError] = useState(false);
+  const [streetError, setStreetError] = useState(false);
+  const [cityError, setCityError] = useState(false);
+  const [stateError, setStateError] = useState(false);
+  const [zipcodeError, setZipcodeError] = useState(false);
+  const [descriptionError, setDescriptionError] = useState(false);
+  const [priceError, setPriceError] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
 
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);
@@ -53,9 +60,9 @@ export default function CreateListing() {
             </div>
           </Stack>
           <Stack direction='column' spacing={2}>
-            <TextField variant='outlined' label='Street' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth />
-            <TextField variant='outlined' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth />
-            <TextField select variant='outlined' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth>
+            <TextField variant='filled' label='Street' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
+            <TextField variant='filled' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={cityError} helperText={cityError ? 'Invalid Input' : null} required fullWidth />
+            <TextField select variant='filled' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={stateError} helperText={stateError ? 'Invalid Input' : null} required fullWidth>
               <MenuItem value='AL'>AL</MenuItem>
               <MenuItem value='AK'>AK</MenuItem>
               <MenuItem value='AZ'>AZ</MenuItem>
@@ -108,12 +115,12 @@ export default function CreateListing() {
               <MenuItem value='WI'>WI</MenuItem>
               <MenuItem value='WY'>WY</MenuItem>
             </TextField>
-            <TextField variant='outlined' label='Zip Code' id='zipcode' name='zipcode' value={zipcode} onChange={handleZipcodeChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth />
-            <TextField multiline rows={3} variant='outlined' label='Description' id='description' name='description' value={description} onChange={handleDescriptionChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth />
-            <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={addressError} helperText={addressError ? 'Invalid Input' : null} required fullWidth />
+            <TextField variant='filled' label='Zip Code' id='zipcode' name='zipcode' value={zipcode} onChange={handleZipcodeChange} size='small' error={zipcodeError} helperText={zipcodeError ? 'Invalid Input' : null} required fullWidth />
+            <TextField multiline rows={3} variant='filled' label='Description' id='description' name='description' value={description} onChange={handleDescriptionChange} size='small' error={descriptionError} helperText={descriptionError ? 'Invalid Input' : null} required fullWidth />
+            <TextField variant='filled' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} required fullWidth />
           </Stack>
         </Stack>
-        <Button variant='contained' disableElevation onClick={() => {}}>Save</Button>
+        <Button variant='contained' type='submit' disableElevation>Save</Button>
       </form>
     </div>
   )
