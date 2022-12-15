@@ -5,15 +5,15 @@ import Listings from "./Listings";
 export default function Home() {
   const { currentUser } = React.useContext(AuthContext);
   let welcomeMessage = currentUser ? (
-    <p>
+    <h1>
       Welcome {currentUser.email}, to GroundBnB. Looking for a backyard to throw
       your next party or barbeque?
-    </p>
+    </h1>
   ) : (
-    <p>
+    <h1>
       Welcome to GroundBnB. Looking for a backyard to throw your next party or
       barbeque?
-    </p>
+    </h1>
   );
 
   return (

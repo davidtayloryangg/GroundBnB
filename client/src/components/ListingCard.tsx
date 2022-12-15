@@ -64,19 +64,6 @@ function ListingCard(props: any) {
           },
         }}
       >
-        {/* This is the image without the image gallery stuff */}
-        {/* <CardMedia
-          component="img"
-          height="250"
-          width="250"
-          image={
-            listing.imageUrls && listing.imageUrls.length > 0
-              ? listing.imageUrls[0]
-              : "/imgs/no_image.jpeg"
-          }
-          alt={listing.listingId}
-          draggable="false"
-        /> */}
         <CardContent>
           <Stack sx={{ height: 330 }}>
             <div className="image-gallery-container">
@@ -90,21 +77,25 @@ function ListingCard(props: any) {
                 ref={imageGalleryRef}
               />
             </div>
-            <Typography variant="h6">
+            <Typography sx={{ fontSize: "20px" }}>
               {listing.address.city}, {listing.address.state}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ fontSize: "14px" }} color="text.secondary">
               {listing.description}
             </Typography>
           </Stack>
           <Stack direction="row" justifyContent="space-between">
-            <Typography display="inline" variant="subtitle2" align="left">
+            <Typography display="inline" sx={{ fontSize: "14px" }} align="left">
               $
               {listing.price % 1 === 0
                 ? listing.price
                 : listing.price.toFixed(2)}
             </Typography>
-            <Typography display="inline" variant="subtitle2" align="right">
+            <Typography
+              display="inline"
+              sx={{ fontSize: "14px" }}
+              align="right"
+            >
               ★
               {listing.averageRating % 1 === 0
                 ? listing.averageRating

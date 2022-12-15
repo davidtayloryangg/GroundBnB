@@ -74,7 +74,7 @@
   background-size: 250px;
 }
 
-.welcome-message > p {
+.welcome-message > h1 {
   color: #4a8500;
   background-color: white;
   font-size: 20px;
