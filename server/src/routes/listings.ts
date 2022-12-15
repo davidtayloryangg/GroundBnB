@@ -156,7 +156,7 @@ listingRoutes.post(
     if (e === 'Listing address already exists') return res.status(400).json({ message: e });
     return res.status(500).json({ message: e });
   }
-);
+});
 
 listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
   const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
