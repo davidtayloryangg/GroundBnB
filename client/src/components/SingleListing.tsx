@@ -14,11 +14,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
 import Box from '@mui/material/Box';
 import { Divider, Grid, Rating, Card , Alert, IconButton, AlertTitle, TextField, CardActions, 
          Stack, CardHeader, CardContent, Button, Typography, Avatar, CardMedia, Dialog, DialogActions,
-         DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+         DialogContent, DialogContentText, DialogTitle, LinearProgress  } from '@mui/material';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import ImageGallery from 'react-image-gallery';
 import { AuthContext } from '../firebase/Auth';
-import { stringFilter } from '../Validation';
+import { stringFilter, reviewFilter, validString } from '../Validation';
 const Timestamp = firestore.Timestamp;
 
 function SingleListing() {
@@ -104,7 +104,9 @@ function SingleListing() {
     };
 
     const addReview = async (reviewText : string) => {
+        
         try {
+            validString(reviewText);
             await axios.post(`http://localhost:4000/listings/${listingIdValue}/review`, {
                 listingId : listingId,
                 userId : currentUser.uid,
@@ -117,6 +119,8 @@ function SingleListing() {
         } catch (e) {
             if (axios.isAxiosError(e)) {
                 setReviewError(e.response.data.message);
+            } else {
+                setReviewError(e);
             }
         }
     };
@@ -172,14 +176,14 @@ function SingleListing() {
 
     if (listingData) {
         const avgRating = parseFloat(listingData.averageRating).toFixed(2);
-        const numOfReviews = listingData.reviews.length;
+        const numOfReviews = (listingData.reviews === undefined) ? 0 : listingData.reviews.length;
         const addressLat = listingData.address.geolocation.latitude;
         const addressLong = listingData.address.geolocation.longitude;
         const tempBookings : Dayjs[] = [];
         let numOfDays = 1;
         let price = parseFloat(listingData.price).toFixed(2);
         let conflict = false;
-        let listingImagesArr : { original : string, thumbnail : string}[] = [];
+        let listingImagesArr : { original : string, originalAlt : string, thumbnail : string, thumbnailAlt : string}[] = [];
         let reviewCards = reviews.map((review) => {
             return buildReviewCard(review);
         });
@@ -187,7 +191,9 @@ function SingleListing() {
         listingData.imageUrls.forEach((image : string) => {
             listingImagesArr.push({ 
                 original : image,
-                thumbnail : image
+                originalAlt : image,
+                thumbnail : image,
+                thumbnailAlt : image
             });
         });
 
@@ -418,7 +424,7 @@ function SingleListing() {
                                         value={textValue}
                                         onChange={(e) => {
                                             try {
-                                                setTextValue(stringFilter(e.target.value));
+                                                setTextValue(reviewFilter(e.target.value));
                                             } catch (e) {
                                                 setReviewError(e);
                                             }
@@ -434,7 +440,7 @@ function SingleListing() {
                 </Grid>
             </div>
         );
-    } else {
+    } else if (listingError[1] !== 'Error Not Found'){
         return (
             <Grid container 
                     alignItems="center"
@@ -444,6 +450,21 @@ function SingleListing() {
                         <CardContent >
                             <Typography variant='h1' fontWeight='bold'>{listingError[0]}</Typography>
                             <Typography variant='h2'>{listingError[1]}</Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        );
+    } else {
+        return (
+            <Grid container 
+                    alignItems="center"
+                    justifyContent="center">
+                <Grid item>
+                    <Card sx={{ border: "none", boxShadow: "none", textAlign: 'center' }}>
+                        <CardContent >
+                            <Typography variant='h1' fontWeight='bold'>Loading</Typography>
+                            <LinearProgress  />
                         </CardContent>
                     </Card>
                 </Grid>
