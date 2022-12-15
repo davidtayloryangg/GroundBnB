@@ -179,7 +179,6 @@ function stringFilter(str: string) {
 }
 
 function reviewFilter(str: string) {
-  validString(str);
   str = xss(str);
   return str;
 }
