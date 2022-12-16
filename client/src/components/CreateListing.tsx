@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { Autocomplete, Box, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useDropzone } from 'react-dropzone';
 import { AuthContext } from '../firebase/Auth';
@@ -62,6 +63,7 @@ export default function CreateListing() {
   const [descriptionError, setDescriptionError] = useState(false);
   const [priceError, setPriceError] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -249,6 +251,7 @@ export default function CreateListing() {
         id='create-listing-form'
         onSubmit={async (e) => {
           e.preventDefault();
+          setLoading(true);
           setStreetError(false);
           setCityError(false);
           setStateError(false);
@@ -265,7 +268,7 @@ export default function CreateListing() {
               console.log(e);
             }
           }
-
+          setLoading(false);
         }}>
         <Stack direction='row' spacing={1} justifyContent='space-evenly'>
           <Stack direction='column'>
@@ -294,7 +297,7 @@ export default function CreateListing() {
             autoComplete
             includeInputInList
             filterSelectedOptions
-            value={value}
+            // value={value}
             onChange={(event: any, newValue: any | null) => {
               setOptions(newValue ? [newValue, ...options] : options);
               setValue(newValue);
@@ -402,7 +405,7 @@ export default function CreateListing() {
             <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth />
           </Stack>
         </Stack>
-        <Button variant='contained' type='submit' disableElevation sx={{width: '150px'}}>Save</Button>
+        <LoadingButton variant='contained' type='submit' disableElevation sx={{width: '150px'}} loading={loading}>Save</LoadingButton>
       </form>
     </div>
   )
