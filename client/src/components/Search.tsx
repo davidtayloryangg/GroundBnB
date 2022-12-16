@@ -10,7 +10,7 @@ import {
     Button,
 } from "@mui/material";
 import axios from "axios";
-
+import {Link} from "react-router-dom";
 
 const Search = () => {
     const { isLoaded } = useJsApiLoader({
@@ -107,11 +107,15 @@ const Search = () => {
                             loading,
                         }) => (
                             <div className="search-input">
+                                <label hidden htmlFor="search-input-bar">
+                                    Search for a location
+                                </label>
                                 <input
                                     {...getInputProps({
                                         placeholder: "Search Places ...",
                                         className: "location-search-input",
                                         key: "search-input-key",
+                                        id: "search-input-bar"
                                     })}
                                 />
                                 <button type="submit" onClick={handleChange}>
@@ -159,20 +163,20 @@ const Search = () => {
                                             height="250"
                                             image={item.imagesUrls?.map((image:any) => image)}
                                         />
-                                        <Typography variant="h6">
+                                        <Typography component="div">
                                             {item.address.city}, {item.address.state}
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography component="div" variant="body2" color="text.secondary">
                                             {item.description}
                                         </Typography>
                                         <Grid container>
                                             <Grid item alignItems="left" xs={6}>
-                                            <Typography variant="subtitle2" align="left">
+                                            <Typography component="div" variant="subtitle2" align="left">
                                                 ${item.price}
                                             </Typography>
                                             </Grid>
                                             <Grid item alignItems="right" xs={6}>
-                                            <Typography variant="subtitle2" align="right">
+                                            <Typography component="div" variant="subtitle2" align="right">
                                                 ★
                                                 {item.averageRating % 1 === 0
                                                 ? item.averageRating
@@ -180,17 +184,15 @@ const Search = () => {
                                             </Typography>
                                             </Grid>
                                         </Grid>
-                                        <CardActions>
-                                            <Button
+                                        <Button
+                                            component="button"
                                             variant="contained"
                                             href={`listing/${item.id}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
                                             style= {{position:"absolute", bottom: 0, left: 0}}
-                                            >
+                                        >
                                             Learn more
-                                            </Button>
-                                        </CardActions>
+                                        </Button>
+
                                     </Card>
                                 </Grid>
                             ))}
