@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const libraries = ["places"];
-const cardStyles = { };
 
 const Search = () => {
     const { isLoaded } = useJsApiLoader({
@@ -31,6 +29,8 @@ const Search = () => {
     const [map, setMap] = useState(null);
     const [lastCardIndex, setLastIndexCard] = useState(1);
     const [page, setPage] = useState(1);
+    const [hasNext, setHasNext] = useState(false);
+    const [hasPrev, setHasPrev] = useState(false);
 
     const handleChange = () => {
         console.log("Hitting change", address, coordinates);
@@ -47,38 +47,57 @@ const Search = () => {
         const settingData = async () => {
           const url = `http://localhost:4000/listings/search/location/${page}?lat=${coordinates.lat}&lon=${coordinates.lng}`;
           const data = await axios.get(url);
-          console.log("Data", data.data);
+          //console.log("Data", data.data);
           setListings(data.data);
           setSearchTerm("");
+          if (page > 1) {
+            setHasPrev(true);
+          } else {
+            setHasPrev(false);
+          }
+          const nextUrl=`http://localhost:4000/listings/search/location/${page+1}?lat=${coordinates.lat}&lon=${coordinates.lng}`;
+            const nextData = await axios.get(nextUrl);
+            if (nextData.data.length > 0) {
+                setHasNext(true);
+            } else {
+                setHasNext(false);
+            }
 
         };
-        if (searchTerm !== "") {
+        if (searchTerm !== "" || page > 0) {
           settingData();
         }
-    }, [searchTerm, page]);
+    }, [searchTerm,page]);
 
     useEffect(() => {
         const initLoad = async () => {
             const url = `http://localhost:4000/listings/search/location/1?lat=${coordinates.lat}&lon=${coordinates.lng}`;
             const data = await axios.get(url);
             setListings(data.data);
-            console.log(data.data.length);
-            console.log(data.data.slice(0, 9));
-            setListingPage(data.data.slice(0, 9));
         };
         initLoad();
     }, []);
+
+    const setNext = () => {
+        setPage(page+1);
+        // alert(page);
+    };
+
+    const setPrev = () => {
+        setPage(page-1);
+        // alert(page);
+    };
 
     if (!isLoaded) {
         return <div>Loading...</div>;
     } else {
         return (
             <div className="content">
-                <div className="search-wrapper">
-                    <h2>Search Container</h2>
+                <div className="search-wrapper" style={{padding: 20}}>
+                    {/* <h2>Search Container</h2>
                     <p>Lat: {coordinates.lat}</p>
                     <p>Lng: {coordinates.lng}</p>
-                    <p>Address: {address}</p>
+                    <p>Address: {address}</p> */}
                     <PlacesAutocomplete
                         value={address}
                         onChange={setAddress}
@@ -128,26 +147,15 @@ const Search = () => {
                     </PlacesAutocomplete>
                 </div>
                 <div className="mapContainer">
-                    <h2>Listings && Map Container</h2>
-                    {/* <button onClick={setPage(page + 1)}>Next Page</button>
-                    <button onClick={setPage(page - 1)}>Previous Page</button> */}
+                    {/* <h2>Listings && Map Container</h2> */}
+                    {hasPrev===true?<Button onClick={setPrev}>Previous Page</Button> : null}
+                    {hasNext===true?<Button onClick={setNext}>Next Page</Button> : null}
                     <Grid container spacing={2}>
                         <Grid container item spacing={2} xs={12} sm={6}>
                         {/* <List style={{maxHeight: 1200, width:"100%", overflow: 'auto'}}> */}
                             {listings?.map((item,index) => (
                                 <Grid item xs={12} md={6} lg={4}>
-                                    <Card style={cardStyles}>
-                                        {/* <AutoPlaySwipeableViews>
-                                            {item.imagesUrls?.map((image) => (
-                                            <div>
-                                                <img src={image} alt="listing" />
-                                            </div>
-                                            ))}
-                                        </AutoPlaySwipeableViews> */}
-                                        {/* <img
-                                            src={item.imagesUrls?.map((image) => image)}
-                                            alt="Temp. Unavailable"
-                                        /> */}
+                                    <Card style={{height:420, position:"relative"}}>
                                         <CardMedia
                                             component="img"
                                             alt="Temp. Unavailable"
@@ -181,6 +189,7 @@ const Search = () => {
                                             href={`listing/${item.id}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
+                                            style= {{position:"absolute", bottom: 0, left: 0}}
                                             >
                                             Learn more
                                             </Button>
