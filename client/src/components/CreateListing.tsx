@@ -6,6 +6,7 @@ import parse from 'autosuggest-highlight/parse';
 import * as _ from 'lodash';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+const PLACESTYPES = ['premise', 'street_address'];
 
 function loadScript(src: string, position: HTMLElement | null, id: string) {
   if (!position) {
@@ -18,7 +19,6 @@ function loadScript(src: string, position: HTMLElement | null, id: string) {
   script.src = src;
   position.appendChild(script);
 }
-
 const autocompleteService = { current: null as any };
 
 interface MainTextMatchedSubstrings {
@@ -33,6 +33,7 @@ interface StructuredFormatting {
 interface PlaceType {
   description: string;
   structured_formatting: StructuredFormatting;
+  types: Array<string>
 }
 
 export default function CreateListing() {
@@ -73,7 +74,7 @@ export default function CreateListing() {
     () =>
       _.throttle(
         (
-          request: { input: string },
+          request: { input: string, types: Array<string> },
           callback: (results?: readonly PlaceType[]) => void,
         ) => {
           (autocompleteService.current as any).getPlacePredictions(
@@ -88,6 +89,12 @@ export default function CreateListing() {
 
   useEffect(() => {
     let active = true;
+    console.log(value);
+    console.log(options);
+
+    if (value) {
+      setStreet(value.structured_formatting.main_text);
+    }
 
     if (!autocompleteService.current && (window as any).google) {
       autocompleteService.current = new (
@@ -103,7 +110,7 @@ export default function CreateListing() {
       return undefined;
     }
 
-    fetch({ input: inputValue }, (results?: readonly PlaceType[]) => {
+    fetch({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
       if (active) {
         let newOptions: readonly PlaceType[] = [];
 
