@@ -110,21 +110,23 @@ export default function CreateListing() {
       return undefined;
     }
 
-    fetch({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
-      if (active) {
-        let newOptions: readonly PlaceType[] = [];
-
-        if (value) {
-          newOptions = [value];
+    if (/^\d+$/.test(inputValue.charAt(0))) {
+      fetch({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
+        if (active) {
+          let newOptions: readonly PlaceType[] = [];
+  
+          if (value) {
+            newOptions = [value];
+          }
+  
+          if (results) {
+            newOptions = [...newOptions, ...results];
+          }
+  
+          setOptions(newOptions);
         }
-
-        if (results) {
-          newOptions = [...newOptions, ...results];
-        }
-
-        setOptions(newOptions);
-      }
-    });
+      });
+    }
 
     return () => {
       active = false;
