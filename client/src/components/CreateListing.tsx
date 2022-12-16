@@ -440,14 +440,17 @@ export default function CreateListing() {
             <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth />
           </Stack>
         </Stack>
-        <LoadingButton variant='contained' type='submit' disableElevation sx={{width: '150px'}} loading={loading}>Save</LoadingButton>
+        <br />
+        <Stack direction='row' alignItems='center' justifyContent='center'>
+          <LoadingButton variant='contained' type='submit' disableElevation sx={{width: '150px'}} loading={loading}>Save</LoadingButton>
+        </Stack>
       </form>
-      <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}} action={viewListing}>
+      <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}} action={viewListing}>
         <Alert onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
           Listing had been created!
         </Alert>
       </Snackbar>
-      <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}}>
+      <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}>
         <Alert onClose={handleErrorSnackClose} severity="error" sx={{ width: '100%' }}>
           {addressError}
         </Alert>
