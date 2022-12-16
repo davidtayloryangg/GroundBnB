@@ -50,6 +50,11 @@
   height: 50px;
 }
 
+.page-heading {
+  text-align: center;
+  padding: 20px;
+}
+
 .image-dropzone-area {
   height: 300px;
   line-height: 300px;

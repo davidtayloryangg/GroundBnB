@@ -7,7 +7,7 @@ import { AuthContext } from '../firebase/Auth';
 import parse from 'autosuggest-highlight/parse';
 import * as _ from 'lodash';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const PLACESTYPES = ['premise', 'street_address'];
@@ -42,6 +42,7 @@ interface PlaceType {
 }
 
 export default function CreateListing() {
+  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
   const [value, setValue] = React.useState<PlaceType | null>(null);
@@ -70,6 +71,12 @@ export default function CreateListing() {
   const [addressError, setAddressError] = useState('');
 
   const [listingId, setListingId] = useState('');
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/signin');
+    }
+  }, [navigate, currentUser]); 
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -266,7 +273,7 @@ export default function CreateListing() {
   return (
     <div>
       <br />
-      <Typography variant='h3' component='div'>Create Listing</Typography>
+      <Typography className='page-heading' variant='h4' component='div'>Create Listing</Typography>
       <br />
       <form
         id='create-listing-form'
