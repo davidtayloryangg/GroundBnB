@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useContext } from 'react';
-import { Autocomplete, Box, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Button, Grid, MenuItem, Snackbar, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useDropzone } from 'react-dropzone';
@@ -7,6 +7,7 @@ import { AuthContext } from '../firebase/Auth';
 import parse from 'autosuggest-highlight/parse';
 import * as _ from 'lodash';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const PLACESTYPES = ['premise', 'street_address'];
@@ -64,6 +65,11 @@ export default function CreateListing() {
   const [priceError, setPriceError] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openSuccessSnack, setOpenSuccessSnack] = useState(false);
+  const [openErrorSnack, setOpenErrorSnack] = useState(false);
+  const [addressError, setAddressError] = useState('');
+
+  const [listingId, setListingId] = useState('');
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -166,6 +172,14 @@ export default function CreateListing() {
     setPrice(e.target.value);
   };
 
+  const handleSuccessSnackClose = (e: any) => {
+    setOpenSuccessSnack(false);
+  }
+
+  const handleErrorSnackClose = (e: any) => {
+    setOpenErrorSnack(false);
+  }
+
   const checkForErrors = () => {
     let errors = false;
     if (street.trim().length === 0) {
@@ -214,7 +228,7 @@ export default function CreateListing() {
     });
     console.log('address validated')
     if (data.result.verdict.hasUnconfirmedComponents || data.result.verdict.hasReplacedComponents) {
-      throw 'Invalid Address'
+      throw 'Address is Invalid'
     }
     console.log('calling server')
     // Need to call post route
@@ -236,11 +250,18 @@ export default function CreateListing() {
       "imageArray[]": acceptedFiles
     }, config)
     console.log(serverReponse);
+    return serverReponse;
   }
 
   const imagesList = acceptedFiles.map((file, index) => {
     return <li key={index}>{file.name}</li>
   });
+
+  const viewListing = (
+    <Link className='link' to={`/listings/${listingId}`}>
+      <Button>View</Button>
+    </Link>
+  );
 
   return (
     <div>
@@ -263,9 +284,23 @@ export default function CreateListing() {
           const errors = checkForErrors();
           if (!errors) {
             try {
-              await createListing(description, price, street, city, state, zipcode, acceptedFiles);
-            } catch (e) {
+              const response = await createListing(description, price, street, city, state, zipcode, acceptedFiles);
+              if (response) {
+                setListingId(response.data.listing.listingId);
+                setOpenSuccessSnack(true);
+              }
+            } catch (e: any) {
               console.log(e);
+              if (typeof e === 'string') {
+                setAddressError(e);
+              }
+              else if (e.response.data.message){
+                setAddressError(e.response.data.message);
+              }
+              else {
+                setAddressError('An error has occurred');
+              }
+              setOpenErrorSnack(true);
             }
           }
           setLoading(false);
@@ -407,6 +442,16 @@ export default function CreateListing() {
         </Stack>
         <LoadingButton variant='contained' type='submit' disableElevation sx={{width: '150px'}} loading={loading}>Save</LoadingButton>
       </form>
+      <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}} action={viewListing}>
+        <Alert onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
+          Listing had been created!
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}}>
+        <Alert onClose={handleErrorSnackClose} severity="error" sx={{ width: '100%' }}>
+          {addressError}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
