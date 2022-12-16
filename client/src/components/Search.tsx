@@ -190,7 +190,7 @@ const Search = () => {
                                             href={`listing/${item.id}`}
                                             style= {{position:"absolute", bottom: 0, left: 0}}
                                         >
-                                            Learn more
+                                            Get Listing Details
                                         </Button>
 
                                     </Card>
