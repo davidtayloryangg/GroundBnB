@@ -73,7 +73,7 @@ export const getAllBookings = async () => {
   });
 };
 
-export const createBooking = async (bookerId : string, listingId : string, numOfPeople : number, ownerId : string, totalPrice : number, endTimestamp : string, startTimestamp : string) => {
+export const createBooking = async (bookerId : string, listingId : string, numOfPeople : number, ownerId : string, totalPrice : number, numOfBookings : number,endTimestamp : string, startTimestamp : string) => {
   const booking = {
     bookerId : bookerId,
     endTimestamp : Timestamp.fromDate(new Date(endTimestamp)),
@@ -85,6 +85,10 @@ export const createBooking = async (bookerId : string, listingId : string, numOf
     status : 'ACTIVE',
     bookingId : null
   };
+
+  await firestore.updateDoc(doc(db, "listings", listingId), {
+    numOfBookings : numOfBookings + 1
+  }); 
 
   const bookingAdded = await firestore.addDoc(collection, booking);
   await firestore.updateDoc(doc(db, "bookings", bookingAdded.id), {
