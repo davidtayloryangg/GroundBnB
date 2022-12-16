@@ -1,9 +1,24 @@
 import "./App.css";
-import { AppBar, Box, Button, Container, Stack, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import DeckIcon from "@mui/icons-material/Deck";
-import { BrowserRouter as Router, Route, Routes, Link, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./firebase/Auth";
 import Home from "./components/Home";
+import MyProfile from "./components/MyProfile";
 import Account from "./components/Account";
 import PrivateRoute from "./components/PrivateRoute";
 import Navigation from "./components/Navigation";
@@ -12,9 +27,9 @@ import SignUp from "./components/SignUp";
 import Landing from "./components/Landing";
 import SignOut from "./components/SignOut";
 import PageNotFound from "./components/PageNotFound";
-import SingleListing from './components/SingleListing';
-import Search from './components/Search';
-import CreateListing from './components/CreateListing';
+import SingleListing from "./components/SingleListing";
+import Search from "./components/Search";
+import CreateListing from "./components/CreateListing";
 
 export default function App() {
   return (
@@ -28,13 +43,13 @@ export default function App() {
             <Route path="/" element={<Navigate to="/listings/page/1" />} />
             <Route path="/bookings" />
             <Route path="/listings/page/:pagenum" element={<Home />} />
-            <Route path="/my-profile" />
+            <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signout" element={<SignOut />} />
             <Route path="*" element={<PageNotFound />} />
-            <Route path="/listing/:listingId" element={<SingleListing />}/>
+            <Route path="/listing/:listingId" element={<SingleListing />} />
             <Route path="/search" element={<Search />} />
           </Routes>
         </div>
