@@ -99,7 +99,11 @@ function SingleListing() {
             setBookingId(data.bookingId);
             setOpen(true);
         } catch (e) {
-            console.log(e);
+            if (axios.isAxiosError(e)) {
+                setBookingError(e.response.data.message);
+            } else {
+                setReviewError(e);
+            }
         } 
     };
 
