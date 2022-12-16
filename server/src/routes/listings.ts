@@ -132,42 +132,31 @@ listingRoutes.post(
     const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
     const imageArray = req.files;
 
-    try {
-      validation.validString(description);
-      validation.validPrice(price);
-      validation.validString(street);
-      validation.validateCity(city);
-      validation.validateState(state);
-      validation.validateZip(zipcode);
-      validation.validUID(ownerId);
-      validation.validateImages(imageArray);
-    } catch (e) {
-      return res.status(400).json({ message: e });
-    }
-
-    try {
-      // data function call
-      const newListingId = await listingsData.createListing(
-        description,
-        price,
-        street,
-        city,
-        state,
-        zipcode,
-        lat,
-        lon,
-        ownerId,
-        imageArray
-      );
-      const newListing = await listingsData.getListing(newListingId);
-      return res
-        .status(200)
-        .json({ message: "Listing added successfully", listing: newListing });
-    } catch (e) {
-      return res.status(500).json({ message: e });
-    }
+  try {
+    validation.validString(description);
+    validation.validPrice(price);
+    validation.validString(street);
+    validation.validateCity(city);
+    validation.validateState(state);
+    validation.validateZip(zipcode);
+    validation.validLatitude(lat);
+    validation.validLongitude(lon);
+    await validation.validUID(ownerId);
+    validation.validateImages(imageArray);
+  } catch (e) {
+    return res.status(400).json({ message: e });
   }
-);
+
+  try {
+    // data function call
+    const newListingId = await listingsData.createListing(description, price, street, city, state, zipcode, lat, lon, ownerId, imageArray);
+    const newListing = await listingsData.getListing(newListingId);
+    return res.status(200).json({ message: 'Listing added successfully', listing: newListing })
+  } catch (e) {
+    if (e === 'Listing address already exists') return res.status(400).json({ message: e });
+    return res.status(500).json({ message: e });
+  }
+});
 
 listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
   const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
@@ -187,6 +176,45 @@ listingRoutes.get("/:listingId", async (req: Request, res: Response) => {
   }
 
   res.status(200).json(listingFound);
+});
+
+listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: Request, res: Response) => {
+  console.log("PUT /listings/edit/:listingId");
+  const listingId = new xss.FilterXSS().process(req.params.listingId).trim();
+  const description = new xss.FilterXSS().process(req.body.description).trim();
+  const price = parseFloat(req.body.price);
+  const street = new xss.FilterXSS().process(req.body.street).trim();
+  const city = new xss.FilterXSS().process(req.body.city).trim();
+  const state = new xss.FilterXSS().process(req.body.state).trim();
+  const zipcode = new xss.FilterXSS().process(req.body.zipcode).trim();
+  const lat = parseFloat(req.body.lat);
+  const lon = parseFloat(req.body.lon);
+  const ownerId = new xss.FilterXSS().process(req.body.ownerId).trim();
+  const imageArray = req.files;
+
+  try {
+    validation.validString(description);
+    validation.validPrice(price);
+    validation.validString(street);
+    validation.validateCity(city);
+    validation.validateState(state);
+    validation.validateZip(zipcode);
+    validation.validLatitude(lat);
+    validation.validLongitude(lon);
+    await validation.validUID(ownerId);
+    validation.validateImages(imageArray);
+  } catch (e) {
+    return res.status(400).json({ message: e })
+  }
+
+  try {
+    const updatedListingId = await listingsData.editListing(listingId, description, price, street, city, state, zipcode, lat, lon, ownerId, imageArray);
+    const updatedListing = await listingsData.getListing(updatedListingId);
+    return res.status(200).json({ message: 'Listing updated successfully', listing: updatedListing })
+  } catch (e) {
+    if (e === 'Listing with listingId does not exist' || e === 'Listing address already exists') return res.status(400).json({ message: e });
+    return res.status(500).json({ message: e });
+  }
 });
 
 listingRoutes.get("/owner/:ownerId", async (req: Request, res: Response) => {
