@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { Autocomplete, Box, Button, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useDropzone } from 'react-dropzone';
+import { AuthContext } from '../firebase/Auth';
 import parse from 'autosuggest-highlight/parse';
 import * as _ from 'lodash';
+import axios from 'axios';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const PLACESTYPES = ['premise', 'street_address'];
@@ -33,10 +35,13 @@ interface StructuredFormatting {
 interface PlaceType {
   description: string;
   structured_formatting: StructuredFormatting;
-  types: Array<string>
+  terms: Array<any>;
+  types: Array<string>;
 }
 
 export default function CreateListing() {
+  const { currentUser } = useContext(AuthContext);
+
   const [value, setValue] = React.useState<PlaceType | null>(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState<readonly PlaceType[]>([]);
@@ -89,11 +94,13 @@ export default function CreateListing() {
 
   useEffect(() => {
     let active = true;
-    console.log(value);
-    console.log(options);
 
     if (value) {
-      setStreet(value.structured_formatting.main_text);
+      // TODO: fill in fields here since address has been selected
+      // https://developers.google.com/maps/documentation/places/web-service/details
+      setStreet(`${value.terms[0].value} ${value.terms[1].value}`);
+      setCity(value.terms[2].value);
+      setState(value.terms[3].value);
     }
 
     if (!autocompleteService.current && (window as any).google) {
@@ -190,9 +197,43 @@ export default function CreateListing() {
     return errors
   };
 
-  const doCreateListing = async (description: String, price: String, street: String, city: String, state: String, zipcode: String, imageArray: Array<File>) => {
-    // Need to get lat/lon
+  const createListing = async (description: String, price: String, street: String, city: String, state: String, zipcode: String, imageArray: Array<File>) => {
+    // Validate address
+    console.log('validating addresss')
+    const { data } = await axios.post(`https://addressvalidation.googleapis.com/v1:validateAddress?key=${GOOGLE_MAPS_API_KEY}`, {
+      address: {
+        regionCode: "US",
+        locality: city,
+        administrativeArea: state,
+        postalCode: zipcode,
+        addressLines: [street]
+      },
+      enableUspsCass: true
+    });
+    console.log('address validated')
+    if (data.result.verdict.hasUnconfirmedComponents || data.result.verdict.hasReplacedComponents) {
+      throw 'Invalid Address'
+    }
+    console.log('calling server')
     // Need to call post route
+    const config = {
+      headers: {
+          'content-type': 'multipart/form-data'
+      }
+    }
+    const serverReponse = await axios.post('http://localhost:4000/listings/create', {
+      description: description,
+      price: price,
+      street: data.result.address.postalAddress.addressLines[0],
+      city: data.result.address.postalAddress.locality,
+      state: data.result.address.postalAddress.administrativeArea,
+      zipcode: data.result.address.postalAddress.postalCode.substring(0, 5),
+      lat: data.result.geocode.location.latitude,
+      lon: data.result.geocode.location.longitude,
+      ownerId: currentUser.uid,
+      "imageArray[]": acceptedFiles
+    }, config)
+    console.log(serverReponse);
   }
 
   const imagesList = acceptedFiles.map((file, index) => {
@@ -219,9 +260,9 @@ export default function CreateListing() {
           const errors = checkForErrors();
           if (!errors) {
             try {
-              await doCreateListing(description, price, street, city, state, zipcode, acceptedFiles);
+              await createListing(description, price, street, city, state, zipcode, acceptedFiles);
             } catch (e) {
-
+              console.log(e);
             }
           }
 
@@ -301,7 +342,7 @@ export default function CreateListing() {
             }}
           />
 
-            <TextField variant='outlined' label='Street' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
+            <TextField variant='outlined' label='Street Address' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
             <TextField variant='outlined' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={cityError} helperText={cityError ? 'Invalid Input' : null} required fullWidth />
             <TextField select variant='outlined' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={stateError} helperText={stateError ? 'Invalid Input' : null} required fullWidth>
               <MenuItem value='AL'>AL</MenuItem>
