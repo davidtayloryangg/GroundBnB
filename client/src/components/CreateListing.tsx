@@ -209,7 +209,7 @@ export default function CreateListing() {
       errors = true;
       setDescriptionError(true);
     }
-    if (price.trim().length === 0 || !/^\d+$/.test(price)) {
+    if (price.trim().length === 0 || !/^[1-9]\d*(\.\d+)?$/.test(price)) {
       errors = true;
       setPriceError(true);
     }
@@ -444,7 +444,7 @@ export default function CreateListing() {
             </TextField>
             <TextField variant='outlined' label='Zip Code' id='zipcode' name='zipcode' value={zipcode} onChange={handleZipcodeChange} size='small' error={zipcodeError} helperText={zipcodeError ? 'Invalid Input' : null} required fullWidth />
             <TextField multiline rows={3} variant='outlined' label='Description' id='description' name='description' value={description} onChange={handleDescriptionChange} size='small' error={descriptionError} helperText={descriptionError ? 'Invalid Input' : null} required fullWidth />
-            <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }} required fullWidth />
+            <TextField variant='outlined' label='Price' id='price' name='price' value={price} onChange={handlePriceChange} size='small' error={priceError} helperText={priceError ? 'Invalid Input' : null} inputProps={{ inputMode: 'numeric' }} required fullWidth />
           </Stack>
         </Stack>
         <br />
@@ -462,6 +462,9 @@ export default function CreateListing() {
           {addressError}
         </Alert>
       </Snackbar>
+      <br />
+      <br />
+      <br />
     </div>
   )
 }
