@@ -51,9 +51,17 @@
 
 .image-dropzone-area {
   height: 300px;
+  line-height: 300px;
   background-color: #f0f0f0;
   border: 1px dashed #8b8b8b;
   padding: 10px;
+  cursor: pointer;
+}
+
+.image-dropzone-area p {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
 }
 
 .error {
