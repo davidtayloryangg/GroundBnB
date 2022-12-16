@@ -8,7 +8,6 @@ import {
     CardActions,
     Typography,
     Button,
-    List,
 } from "@mui/material";
 import axios from "axios";
 
@@ -25,9 +24,7 @@ const Search = () => {
     const [address, setAddress] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [listings, setListings] = useState([]);
-    const [listingPage, setListingPage] = useState([]);
     const [map, setMap] = useState(null);
-    const [lastCardIndex, setLastIndexCard] = useState(1);
     const [page, setPage] = useState(1);
     const [hasNext, setHasNext] = useState(false);
     const [hasPrev, setHasPrev] = useState(false);
