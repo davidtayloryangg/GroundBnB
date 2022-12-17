@@ -104,6 +104,34 @@
   height: 50px;
 }
 
+.page-heading {
+  text-align: center;
+  padding: 20px;
+}
+
+.image-dropzone-area {
+  height: 300px;
+  line-height: 300px;
+  background-color: #f0f0f0;
+  border: 1px dashed #8b8b8b;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.image-dropzone-area:hover {
+  box-shadow: 0 0 11px rgba(33,33,33,.2); 
+}
+
+.image-dropzone-area p {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+
+.error {
+  color: #d33031;
+}
+
 .image-gallery-container .image-gallery-slides {
   width: 401px;
   height: 250px;
