@@ -12,9 +12,11 @@ import isBetween from "dayjs/plugin/isBetween";
 import { LocalizationProvider, DateRangePicker, DateRange } from '@mui/x-date-pickers-pro';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
 import Box from '@mui/material/Box';
-import { Divider, Grid, Rating, Card , Alert, IconButton, AlertTitle, TextField, CardActions, 
-         Stack, CardHeader, CardContent, Button, Typography, Avatar, CardMedia, Dialog, DialogActions,
-         DialogContent, DialogContentText, DialogTitle, LinearProgress  } from '@mui/material';
+import {
+    Divider, Grid, Rating, Card, Alert, IconButton, AlertTitle, TextField, CardActions,
+    Stack, CardHeader, CardContent, Button, Typography, Avatar, CardMedia, Dialog, DialogActions,
+    DialogContent, DialogContentText, DialogTitle, LinearProgress
+} from '@mui/material';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import ImageGallery from 'react-image-gallery';
 import { AuthContext } from '../firebase/Auth';
@@ -47,26 +49,28 @@ function SingleListing() {
         if (numberOfPeople > 1) setNumberOfPeople(numberOfPeople - 1);
     };
 
-    const buildReviewCard = (review : {user : string, rating: number, text: string, date: string}) => {
+    const buildReviewCard = (review: { user: string, rating: number, text: string, date: string }) => {
         return (
-            <Grid item sx={{pb: 4}} key={Math.random()}>
+            <Grid item sx={{ pb: 4 }} key={Math.random()}>
                 <Card>
                     <CardHeader
                         avatar={
-                            <Avatar src="/broken-image.jpg"/>
+                            <Avatar src="/broken-image.jpg" />
                         }
                         title={review.user}
                         subheader={review.date}
                     >
                     </CardHeader>
                     <CardContent>
-                        <Rating 
-                            name="read-only" 
+                        <Rating
+                            name="read-only"
                             value={review.rating}
-                            sx={{'& .MuiRating-iconFilled' : {
-                                color : '#000000'
-                            }}}
-                            readOnly 
+                            sx={{
+                                '& .MuiRating-iconFilled': {
+                                    color: '#000000'
+                                }
+                            }}
+                            readOnly
                         />
                         <Typography>{review.text}</Typography>
                     </CardContent>
@@ -78,7 +82,7 @@ function SingleListing() {
     const bookListing = async () => {
 
         if (currentUser === null) {
-            navigate('/login');
+            navigate('/signin');
             return;
         }
 
@@ -89,11 +93,11 @@ function SingleListing() {
 
         try {
             const { data } = await axios.post('http://localhost:4000/bookings/create', {
-                bookerId : currentUser.uid,
-                listingId : listingData.listingId,
-                numOfPeople : numberOfPeople,
-                endTimestamp : value[1].toDate(),
-                startTimestamp : value[0].toDate()
+                bookerId: currentUser.uid,
+                listingId: listingData.listingId,
+                numOfPeople: numberOfPeople,
+                endTimestamp: value[1].toDate(),
+                startTimestamp: value[0].toDate()
             });
 
             setBookingId(data.bookingId);
@@ -104,19 +108,19 @@ function SingleListing() {
             } else {
                 setReviewError(e);
             }
-        } 
+        }
     };
 
-    const addReview = async (reviewText : string) => {
-        
+    const addReview = async (reviewText: string) => {
+
         try {
             validString(reviewText);
             await axios.post(`http://localhost:4000/listings/${listingIdValue}/review`, {
-                listingId : listingId,
-                userId : currentUser.uid,
-                rating : reviewRating,
-                text : reviewText,
-                date : new Date()
+                listingId: listingId,
+                userId: currentUser.uid,
+                rating: reviewRating,
+                text: reviewText,
+                date: new Date()
             });
 
             window.location.reload();
@@ -137,21 +141,21 @@ function SingleListing() {
 
                 if (data) {
                     if (data.reviews.length !== 0) {
-                        let reviewsArr : {user : string, rating : string, text : string, date: string}[] = [];
+                        let reviewsArr: { user: string, rating: string, text: string, date: string }[] = [];
                         for (let review of data.reviews) {
                             let reviewDate = new Timestamp(review.date.seconds, review.date.nanoseconds).toDate();
-                            let fullName : string = 'Unknown User';
+                            let fullName: string = 'Unknown User';
 
                             try {
-                                let { data } = await axios.get(`http://localhost:4000/users/${review.userId}`); 
+                                let { data } = await axios.get(`http://localhost:4000/users/${review.userId}`);
                                 fullName = `${data.firstName} ${data.lastName}`;
                             } catch (e) { }
 
                             reviewsArr.push({
                                 user: fullName,
-                                rating : review.rating,
-                                text : review.text,
-                                date : `${reviewDate.toLocaleDateString('default', {month : 'long'})} ${reviewDate.getFullYear()}`
+                                rating: review.rating,
+                                text: review.text,
+                                date: `${reviewDate.toLocaleDateString('default', { month: 'long' })} ${reviewDate.getFullYear()}`
                             });
                         }
 
@@ -159,15 +163,15 @@ function SingleListing() {
                     }
                 }
 
-                if(data.numOfBookings !== 0) {
+                if (data.numOfBookings !== 0) {
                     try {
                         data = await axios.get(`http://localhost:4000/bookings/listing/${listingIdValue}?excludeCanceled=true`);
                         setBookingsForListingData(data.data);
-                    } catch (e) {}
+                    } catch (e) { }
                 }
             } catch (e) {
                 if (axios.isAxiosError(e)) {
-                    
+
                     setListingError([e.response.status, e.response.data.message]);
                 } else {
                     setListingError([500, e.toString()]);
@@ -183,21 +187,21 @@ function SingleListing() {
         const numOfReviews = (listingData.reviews === undefined) ? 0 : listingData.reviews.length;
         const addressLat = listingData.address.geolocation.latitude;
         const addressLong = listingData.address.geolocation.longitude;
-        const tempBookings : Dayjs[] = [];
+        const tempBookings: Dayjs[] = [];
         let numOfDays = 1;
         let price = parseFloat(listingData.price).toFixed(2);
         let conflict = false;
-        let listingImagesArr : { original : string, originalAlt : string, thumbnail : string, thumbnailAlt : string}[] = [];
+        let listingImagesArr: { original: string, originalAlt: string, thumbnail: string, thumbnailAlt: string }[] = [];
         let reviewCards = reviews.map((review) => {
             return buildReviewCard(review);
         });
 
-        listingData.imageUrls.forEach((image : string) => {
-            listingImagesArr.push({ 
-                original : image,
-                originalAlt : image,
-                thumbnail : image,
-                thumbnailAlt : image
+        listingData.imageUrls.forEach((image: string) => {
+            listingImagesArr.push({
+                original: image,
+                originalAlt: image,
+                thumbnail: image,
+                thumbnailAlt: image
             });
         });
 
@@ -208,7 +212,7 @@ function SingleListing() {
             numOfDays = 1;
         }
 
-        const disableBookedDates = (date : Dayjs) => {
+        const disableBookedDates = (date: Dayjs) => {
             let dateFound = false;
 
             for (let booking of bookingsForListingData) {
@@ -227,34 +231,37 @@ function SingleListing() {
             return dateFound;
         }
 
+        if (!currentUser) {
+            navigate("/signin")
+        }
         return (
             <div>
                 <Grid container spacing={4}
-                                alignItems="center"
-                                justifyContent="center"
+                    alignItems="center"
+                    justifyContent="center"
                 >
                     <Grid item justifyContent='center' alignItems='center'>
                         <Card style={{ border: "none", boxShadow: "none" }}>
-                            <CardContent sx={{paddingBottom: '20px'}}>
+                            <CardContent sx={{ paddingBottom: '20px' }}>
                                 <Typography variant='h1' fontSize='55px' marginBottom='10px' fontWeight='bold'>{listingData.address.street}</Typography>
-                                <Typography variant='h2' fontSize='30px'><StarIcon fontSize='small'/> {avgRating} &middot; {listingData.address.city}, {listingData.address.state}, US {listingData.address.zipcode}</Typography>
-                            </CardContent> 
+                                <Typography variant='h2' fontSize='30px'><StarIcon fontSize='small' /> {avgRating} &middot; {listingData.address.city}, {listingData.address.state}, US {listingData.address.zipcode}</Typography>
+                            </CardContent>
                             <CardMedia>
                                 <ImageGallery items={listingImagesArr} />
                             </CardMedia>
                         </Card>
                     </Grid>
                     <Grid item justifySelf='center' maxWidth='5' marginTop='25px'>
-                        <Card sx={{ minWidth: 275, alignItems: 'center', justifyContent: 'center'}}>
+                        <Card sx={{ minWidth: 275, alignItems: 'center', justifyContent: 'center' }}>
                             <CardContent>
                                 <Typography sx={{ fontSize: 19 }} color="text.secondary" fontWeight='bold' gutterBottom>
-                                    ${listingData.price} per day 
+                                    ${listingData.price} per day
                                 </Typography>
                                 <Typography sx={{ fontSize: 13 }} color="text.secondary" fontWeight='bold' gutterBottom>
                                     {numOfReviews} reviews
                                 </Typography>
                                 <Typography variant="body2" width='400'>
-                                {listingData.description}
+                                    {listingData.description}
                                 </Typography>
                             </CardContent>
                             <CardActions>
@@ -272,15 +279,15 @@ function SingleListing() {
                                 </Button>
                             </CardActions>
                             <CardContent>
-                                    { bookingError ?
-                                        <Alert
-                                            key='booking-date-error'
-                                            severity='error'
-                                        >
-                                            <Typography sx={{ fontSize: 13 }}>{bookingError}</Typography>
-                                        </Alert>
-                                        : undefined
-                                    }
+                                {bookingError ?
+                                    <Alert
+                                        key='booking-date-error'
+                                        severity='error'
+                                    >
+                                        <Typography sx={{ fontSize: 13 }}>{bookingError}</Typography>
+                                    </Alert>
+                                    : undefined
+                                }
                             </CardContent>
                             <CardActions>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -288,7 +295,7 @@ function SingleListing() {
                                         disablePast
                                         value={value}
                                         onChange={(newValue) => {
-                                            if((value[0] === null || newValue[1] === null) || bookingsForListingData.length === 0) {
+                                            if ((value[0] === null || newValue[1] === null) || bookingsForListingData.length === 0) {
                                                 setValue(newValue);
                                             } else if (bookingsForListingData.length !== 0) {
                                                 if (newValue[0] !== null) {
@@ -299,7 +306,7 @@ function SingleListing() {
                                                             conflict = true;
                                                         }
                                                     });
-                                                    
+
                                                     if (!conflict) {
                                                         conflict = false;
                                                         setValue(newValue);
@@ -308,22 +315,22 @@ function SingleListing() {
                                             }
                                         }}
                                         renderInput={(startProps, endProps) => (
-                                        <React.Fragment>
-                                                    { conflict ?
-                                                                <Alert
-                                                                    key='datepicker-date-error'
-                                                                    severity='error'
-                                                                    style={{height:'100%', wordWrap: "break-word", overflowWrap: "break-word" }}
-                                                                >
-                                                                    <AlertTitle sx={{fontSize: 14}}>Pick new dates</AlertTitle>
-                                                                    <Typography sx={{ fontSize: 13 }}>Dates picked conflict with current bookings!</Typography>
-                                                                </Alert> : undefined
-                                                    }
-                                                        <TextField {...startProps}/>
-                                                            <Box sx={{ mx: 2 }}> to </Box>
-                                                        <TextField {...endProps} />
-                                                    
-                                        </React.Fragment>
+                                            <React.Fragment>
+                                                {conflict ?
+                                                    <Alert
+                                                        key='datepicker-date-error'
+                                                        severity='error'
+                                                        style={{ height: '100%', wordWrap: "break-word", overflowWrap: "break-word" }}
+                                                    >
+                                                        <AlertTitle sx={{ fontSize: 14 }}>Pick new dates</AlertTitle>
+                                                        <Typography sx={{ fontSize: 13 }}>Dates picked conflict with current bookings!</Typography>
+                                                    </Alert> : undefined
+                                                }
+                                                <TextField {...startProps} />
+                                                <Box sx={{ mx: 2 }}> to </Box>
+                                                <TextField {...endProps} />
+
+                                            </React.Fragment>
                                         )}
                                         shouldDisableDate={disableBookedDates}
                                     />
@@ -332,15 +339,16 @@ function SingleListing() {
                             <CardActions>
                                 <LoadScript
                                     googleMapsApiKey='AIzaSyDdyfTCvAdjx1xoiGciyy8csFjETA7_Zs8'>
-                                        <GoogleMap
-                                            mapContainerStyle={{        
-                                                height: "35vh",
-                                                width: "100%"}}
-                                            zoom={16}
-                                            center={{lat: addressLat, lng: addressLong}}
-                                        >
-                                            <Marker key={Math.random()} position={{lat: addressLat, lng: addressLong}}/>
-                                        </GoogleMap>
+                                    <GoogleMap
+                                        mapContainerStyle={{
+                                            height: "35vh",
+                                            width: "100%"
+                                        }}
+                                        zoom={16}
+                                        center={{ lat: addressLat, lng: addressLong }}
+                                    >
+                                        <Marker key={Math.random()} position={{ lat: addressLat, lng: addressLong }} />
+                                    </GoogleMap>
                                 </LoadScript>
                             </CardActions>
                             <CardContent>
@@ -348,14 +356,14 @@ function SingleListing() {
                                     ${listingData.price} X {numOfDays} days &nbsp; &nbsp;
                                 </Typography>
                             </CardContent>
-                            <Divider sx={{borderBottomWidth: 4}}/>
+                            <Divider sx={{ borderBottomWidth: 4 }} />
                             <CardContent>
                                 <Typography fontWeight='bold'>
                                     Total due upon arrival &nbsp; &nbsp; ${price}
                                 </Typography>
-                            </CardContent> 
-                            <CardActions sx={{marginBottom: '10px', alignItems: 'center', justifyContent: 'center'}}>
-                                {currentUser !== null && listingData.ownerId === currentUser.uid ? 
+                            </CardContent>
+                            <CardActions sx={{ marginBottom: '10px', alignItems: 'center', justifyContent: 'center' }}>
+                                {currentUser !== null && listingData.ownerId === currentUser.uid ?
                                     <Button aria-label="edit listing" variant='contained' color='warning' onClick={(e) => navigate(`/listings/edit/${listingIdValue}`)} >
                                         Edit this listing
                                     </Button> :
@@ -369,86 +377,88 @@ function SingleListing() {
                                     aria-describedby="confirmation-dialog-description"
                                 >
                                     <DialogTitle id="confirmation-dialog-title">
-                                    {"Booking Confirmation"}
+                                        {"Booking Confirmation"}
                                     </DialogTitle>
                                     <DialogContent>
-                                    <DialogContentText id="confirmation-dialog-description">
-                                        <Typography>Your booking has been successfully saved! Your confirmation code is </Typography>
-                                        <Typography sx={{ fontWeight : 'bold'}}>{bookingId}</Typography>
-                                    </DialogContentText>
+                                        <DialogContentText id="confirmation-dialog-description">
+                                            <Typography>Your booking has been successfully saved! Your confirmation code is </Typography>
+                                            <Typography sx={{ fontWeight: 'bold' }}>{bookingId}</Typography>
+                                        </DialogContentText>
                                     </DialogContent>
                                     <DialogActions>
-                                    <Button onClick={(e) => navigate('/')} autoFocus>
-                                        Home
-                                    </Button>
-                                    <Button onClick={(e) => window.location.reload()}>
-                                        Go Back
-                                    </Button>
+                                        <Button onClick={(e) => navigate('/')} autoFocus>
+                                            Home
+                                        </Button>
+                                        <Button onClick={(e) => window.location.reload()}>
+                                            Go Back
+                                        </Button>
                                     </DialogActions>
                                 </Dialog>
                             </CardActions>
                         </Card>
                     </Grid>
-                    <Grid container sx={{pt: 5}} 
-                                alignItems="center"
-                                justifyContent="center"
+                    <Grid container sx={{ pt: 5 }}
+                        alignItems="center"
+                        justifyContent="center"
                     >
-                        <Stack spacing={2} sx={{ width : '65%'}}>
+                        <Stack spacing={2} sx={{ width: '65%' }}>
                             <Grid item>
                                 <Typography variant='h3' fontSize='20px'>
-                                    <StarIcon fontSize='small'/> {avgRating} &middot; {numOfReviews} reviews
+                                    <StarIcon fontSize='small' /> {avgRating} &middot; {numOfReviews} reviews
                                 </Typography>
                             </Grid>
                             {currentUser !== null && listingData.ownerId !== currentUser.uid ?
-                                <Grid item sx={{pb: 4}}>
-                                    <Card sx={{border: 'none', boxShadow: 'none'}}>
-                                    { reviewError ?
-                                        <Alert
-                                            key='review-date-error'
-                                            severity='error'
-                                        >
-                                            <Typography sx={{ fontSize: 13 }}>{reviewError}</Typography>
-                                        </Alert>
-                                        : undefined
-                                    }
-                                    <Rating
-                                        name="simple-controlled"
-                                        value={reviewRating}
-                                        onChange={(event, newValue) => {
-                                            console.log(newValue);
-                                            setReviewRating(newValue);
-                                        }}
-                                        sx={{'& .MuiRating-iconFilled': {
-                                            color : '#000000'
-                                        }}}
-                                    />
-                                    <TextField fullWidth 
-                                        label="Add your review here" 
-                                        id="review-textbox"
-                                        value={textValue}
-                                        onChange={(e) => {
-                                            try {
-                                                setTextValue(reviewFilter(e.target.value));
-                                            } catch (e) {
-                                                setReviewError(e);
-                                            }
-                                        }}
-                                        InputProps={{endAdornment: <IconButton aria-label="Add comment" onClick={(e) => addReview(textValue)}><AddCommentIcon /></IconButton>}}
-                                    />
+                                <Grid item sx={{ pb: 4 }}>
+                                    <Card sx={{ border: 'none', boxShadow: 'none' }}>
+                                        {reviewError ?
+                                            <Alert
+                                                key='review-date-error'
+                                                severity='error'
+                                            >
+                                                <Typography sx={{ fontSize: 13 }}>{reviewError}</Typography>
+                                            </Alert>
+                                            : undefined
+                                        }
+                                        <Rating
+                                            name="simple-controlled"
+                                            value={reviewRating}
+                                            onChange={(event, newValue) => {
+                                                console.log(newValue);
+                                                setReviewRating(newValue);
+                                            }}
+                                            sx={{
+                                                '& .MuiRating-iconFilled': {
+                                                    color: '#000000'
+                                                }
+                                            }}
+                                        />
+                                        <TextField fullWidth
+                                            label="Add your review here"
+                                            id="review-textbox"
+                                            value={textValue}
+                                            onChange={(e) => {
+                                                try {
+                                                    setTextValue(reviewFilter(e.target.value));
+                                                } catch (e) {
+                                                    setReviewError(e);
+                                                }
+                                            }}
+                                            InputProps={{ endAdornment: <IconButton aria-label="Add comment" onClick={(e) => addReview(textValue)}><AddCommentIcon /></IconButton> }}
+                                        />
                                     </Card>
                                 </Grid>
-                            : undefined}
+                                : undefined}
                             {reviewCards}
                         </Stack>
                     </Grid>
                 </Grid>
             </div>
         );
-    } else if (listingError[1] !== 'Error Not Found'){
+    } else if (listingError[1] !== 'Error Not Found') {
         return (
-            <Grid container 
-                    alignItems="center"
-                    justifyContent="center">
+            <Grid container
+                alignItems="center"
+                justifyContent="center">
                 <Grid item>
                     <Card sx={{ border: "none", boxShadow: "none", textAlign: 'center' }}>
                         <CardContent >
@@ -461,21 +471,21 @@ function SingleListing() {
         );
     } else {
         return (
-            <Grid container 
-                    alignItems="center"
-                    justifyContent="center">
+            <Grid container
+                alignItems="center"
+                justifyContent="center">
                 <Grid item>
                     <Card sx={{ border: "none", boxShadow: "none", textAlign: 'center' }}>
                         <CardContent >
                             <Typography variant='h1' fontWeight='bold'>Loading</Typography>
-                            <LinearProgress  />
+                            <LinearProgress />
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
         );
     }
-    
+
 }
 
 export default SingleListing;
