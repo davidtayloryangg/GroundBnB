@@ -37,6 +37,9 @@ const Navigation = () => {
                   Listings
                 </Button>
               </Link>
+              <Link className='link' to='/search'>
+                <Button variant='contained' disableElevation>Search</Button>
+              </Link>
               <Link className="link" to="/bookings">
                 <Button variant="contained" disableElevation>
                   Bookings
