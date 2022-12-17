@@ -88,27 +88,31 @@ listingRoutes.post(
       return;
     }
 
-    const getUserBookings = await bookingsData.getUserBookingsForGivenListingId(userId, listingId);
+    const getUserBookings = await bookingsData.getUserBookingsForGivenListingId(
+      userId,
+      listingId
+    );
     if (getUserBookings.length === 0) {
       res
         .status(409)
-        .json({ message : 'User has not previously booked this listing'});
+        .json({ message: "User has not previously booked this listing" });
       return;
     }
 
     let hasPreviouslyBooked = false;
     getUserBookings.forEach((booking) => {
-      console.log(booking.startTimestamp.toDate().getTime());
-      console.log(new Date().getTime());
+      // console.log(booking.startTimestamp.toDate().getTime());
+      // console.log(new Date().getTime());
       if (booking.startTimestamp.toDate().getTime() < new Date().getTime()) {
         hasPreviouslyBooked = true;
       }
     });
 
-    if(!hasPreviouslyBooked) {
-      res
-        .status(409)
-        .json({ message : 'User has not previously booked this listing'});
+    if (!hasPreviouslyBooked) {
+      res.status(409).json({
+        message:
+          "User cannot review listing until on or after their start date.",
+      });
       return;
     }
 
