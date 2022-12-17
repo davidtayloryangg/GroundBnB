@@ -1,6 +1,6 @@
 import * as firestore from "firebase/firestore";
 import { where, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { ref, uploadString, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "../firebase/config";
 const collection = firestore.collection(db, "listings");
 const doc = firestore.doc;
@@ -21,9 +21,10 @@ export const getAllListings = async () => {
       id: doc.id,
       description: data.description,
       address: data.address,
+      averageRating: data.averageRating,
       imagesUrls: data.imageUrls,
-      ownerId: data.owner,
-      numberOfBookings: data.numberOfBookings,
+      ownerId: data.ownerId,
+      price: data.price,
       reviews: data.reviews,
     };
   });
@@ -73,18 +74,7 @@ const cropImage = (image) => {
   });
 };
 
-export const createListing = async (
-  description: String,
-  price: Number,
-  street: String,
-  city: String,
-  state: String,
-  zipcode: String,
-  lat: number,
-  lon: number,
-  ownerId: String,
-  imageArray
-) => {
+export const createListing = async (description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
   // check if address already exists
   const q1 = firestore.query(
     collection,
@@ -123,9 +113,8 @@ export const createListing = async (
     reviews: [],
   });
 
-  let imageUrls = [];
-
   // uploading images
+  let imageUrls = [];
   for (let i = 0; i < imageArray.length; i++) {
     const storageRef = ref(storage, `${ownerId}/${docRef.id}-${i}.jpg`);
     await cropImage(imageArray[i]);
@@ -154,6 +143,85 @@ export const createListing = async (
 
   return docRef.id;
 };
+
+export const editListing = async (listingId: string, description: String, price: Number, street: String, city: String, state: String, zipcode: String, lat: number, lon: number, ownerId: String, imageArray) => {
+  // check if listing exists
+  const listingData = await getListing(listingId);
+  if (!listingData) throw 'Listing with listingId does not exist';
+  if (listingData.ownerId !== ownerId) throw 'Listing does not belong to user currently logged in';
+
+  // check if address already exists
+  const q1 = firestore.query(
+    collection,
+    where("address.street", "==", street),
+    where("address.city", "==", city),
+    where("address.state", "==", state),
+    where("address.zipcode", "==", zipcode)
+  );
+  const querySnapshot1 = await firestore.getDocs(q1);
+  if (querySnapshot1.size > 1) throw "Listing address already exists";
+  querySnapshot1.forEach((doc) => {
+    if (doc.id !== listingId) throw "Listing address already exists";
+  });
+
+  const geolocation = new GeoPoint(lat, lon);
+  const q2 = firestore.query(
+    collection,
+    where("address.geolocation", "==", geolocation)
+  );
+  const querySnapshot2 = await firestore.getDocs(q2);
+  if (querySnapshot2.size > 1) throw "Listing address already exists";
+  querySnapshot2.forEach((doc) => {
+    if (doc.id !== listingId) throw "Listing address already exists";
+  });
+
+  // delete current images
+  for (let i = 0; i < listingData.imageUrls.length; i++) {
+    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+    deleteObject(storageRef)
+      .then(() => console.log('Image deleted'))
+      .catch((e) => console.log(e));
+  }
+
+  // uploading images
+  let imageUrls = [];
+  for (let i = 0; i < imageArray.length; i++) {
+    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+    await cropImage(imageArray[i]);
+
+    const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
+    const fileToUpload = fs
+      .readFileSync(path.resolve(__dirname, fileToUploadPath))
+      .toString("base64");
+
+    await uploadString(storageRef, fileToUpload, "base64")
+      .then(async (snapshot) => {
+        console.log("File uploaded!");
+        await getDownloadURL(
+          ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
+        ).then((url) => imageUrls.push(url));
+      })
+      .catch((e) => console.log(e));
+    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+    fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
+  }
+
+  // update document
+  await firestore.updateDoc(doc(db, "listings", listingId), {
+    description: description,
+    price: parseFloat(price.toFixed(2)),
+    address: {
+      street: street,
+      city: city,
+      state: state,
+      zipcode: zipcode,
+      geolocation: geolocation,
+    },
+    imageUrls: imageUrls,
+  });
+
+  return listingId;
+}
 
 export const getListings = async (pageNum: number, filterBy: string | null) => {
   let listingLimit: number = pageNum * itemsPerPage;

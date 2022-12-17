@@ -37,6 +37,9 @@ const Navigation = () => {
                   Listings
                 </Button>
               </Link>
+              <Link className='link' to='/search'>
+                <Button variant='contained' disableElevation>Search</Button>
+              </Link>
               <Link className="link" to="/bookings">
                 <Button variant="contained" disableElevation>
                   Bookings
@@ -46,6 +49,9 @@ const Navigation = () => {
                 <Button variant="contained" disableElevation>
                   My Profile
                 </Button>
+              </Link>
+              <Link className='link' to='/create-listing'>
+                  <Button variant='contained' disableElevation>Create Listing</Button>
               </Link>
             </Stack>
             <Stack direction="row" spacing={0} justifyContent="flex-end">
