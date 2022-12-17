@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
 import { doSignOut } from "../firebase/FirebaseFunctions";
@@ -11,6 +11,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import DeckIcon from "@mui/icons-material/Deck";
@@ -81,7 +82,7 @@ const Navigation = () => {
             <Stack direction="row" spacing={0} justifyContent="flex-end">
               {currentUser ? (
                 <div>
-                  <IconButton
+                  <Button
                     size="large"
                     aria-label="account of current user"
                     aria-controls="menu-appbar"
@@ -89,8 +90,20 @@ const Navigation = () => {
                     onClick={handleMenu}
                     color="inherit"
                   >
-                    <AccountCircle />
-                  </IconButton>
+                    <Stack direction="row" spacing={1}>
+                      <AccountCircle />
+                      <Typography
+                        sx={{
+                          fontSize: "15px",
+                          fontWeight: "bold",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {currentUser.displayName}
+                      </Typography>
+                    </Stack>
+                  </Button>
                   <Menu
                     id="menu-appbar"
                     anchorEl={anchorEl}

@@ -6,8 +6,8 @@ export default function Home() {
   const { currentUser } = React.useContext(AuthContext);
   let welcomeMessage = currentUser ? (
     <h1>
-      Welcome {currentUser.email}, to GroundBnB. Looking for a backyard to throw
-      your next party or barbeque?
+      Welcome {currentUser.displayName}, to GroundBnB. Looking for a backyard to
+      throw your next party or barbeque?
     </h1>
   ) : (
     <h1>
