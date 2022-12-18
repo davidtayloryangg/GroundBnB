@@ -41,7 +41,6 @@ export default function App() {
         <div className="App-body">
           <Routes>
             <Route path="/" element={<Navigate to="/listings/page/1" />} />
-            <Route path="/bookings" />
             <Route path="/listings/page/:pagenum" element={<Home />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/create-listing" element={<CreateListing />} />
