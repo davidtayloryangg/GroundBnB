@@ -248,7 +248,7 @@ listingRoutes.put("/edit/:listingId", upload.array('imageArray[]'), async (req: 
     validation.validLatitude(lat);
     validation.validLongitude(lon);
     await validation.validUID(ownerId);
-    validation.validateImages(imageArray);
+    // validation.validateImages(imageArray);
   } catch (e) {
     return res.status(400).json({ message: e })
   }

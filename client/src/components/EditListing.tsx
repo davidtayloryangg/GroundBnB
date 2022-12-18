@@ -253,10 +253,6 @@ export default function EditListing() {
       errors = true;
       setPriceError(true);
     }
-    if (acceptedFiles.length === 0) {
-      errors = true;
-      setImageError(true);
-    }
     return errors
   };
 
