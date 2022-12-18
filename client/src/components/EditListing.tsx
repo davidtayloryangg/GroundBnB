@@ -46,6 +46,9 @@ export default function EditListing() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
+  const [pageLoad, setPageLoad] = useState(false);
+  const [pageError, setPageError] = useState(false);
+  const [pageErrorMessage, setPageErrorMessage] = useState('');
   const [value, setValue] = React.useState<PlaceType | null>(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState<readonly PlaceType[]>([]);
@@ -76,6 +79,38 @@ export default function EditListing() {
       navigate('/signin');
     }
   }, [navigate, currentUser]); 
+
+  useEffect(() => {
+    async function getListing() {
+      try {
+        setPageLoad(true);
+        setPageError(false);
+        const { data } = await axios.get(`http://localhost:4000/listings/${listingId}`);
+        console.log(data);
+        if (data.ownerId !== currentUser.uid) throw '403 - Access is Forbidden';
+        setStreet(data.address.street);
+        setCity(data.address.city);
+        setState(data.address.state);
+        setZipcode(data.address.zipcode);
+        setDescription(data.description);
+        setPrice(data.price.toString());
+      } catch (e: any) {
+        console.log(e);
+        setPageError(true);
+        if (typeof e === 'string') {
+          setPageErrorMessage(e);
+        }
+        else if (e.response.data.message && e.response.status) {
+          setPageErrorMessage(`${e.response.status} - ${e.response.data.message}`);
+        }
+        else {
+          setPageErrorMessage('An error occurred');
+        }
+      }
+      setPageLoad(false);
+    }
+    getListing();
+  }, [ listingId ])
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -268,6 +303,22 @@ export default function EditListing() {
       <Button>View</Button>
     </Link>
   );
+
+  if (pageLoad) {
+    return (
+      <div>
+        <Typography className='page-heading' variant='h4' component='div'>Loading...</Typography>
+      </div>
+    )
+  }
+
+  if (pageError) {
+    return (
+      <div>
+        <Typography className='page-heading' variant='h4' component='div'>{pageErrorMessage}</Typography>
+      </div>
+    )
+  }
 
   return (
     <div>
