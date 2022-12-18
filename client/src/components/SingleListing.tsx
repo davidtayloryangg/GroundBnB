@@ -241,6 +241,10 @@ function SingleListing() {
       originalAlt: string;
       thumbnail: string;
       thumbnailAlt: string;
+      originalHeight?: number;
+      originalWidth?: number;
+      sizes?: string;
+      srcSet?: string;
     }[] = [];
     let reviewCards = reviews.map((review) => {
       return buildReviewCard(review);
@@ -252,6 +256,10 @@ function SingleListing() {
         originalAlt: image,
         thumbnail: image,
         thumbnailAlt: image,
+        originalHeight: 500,
+        originalWidth: 500,
+        sizes: "100vw",
+        srcSet: `${image} 500w`,
       });
     });
 
