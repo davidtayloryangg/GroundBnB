@@ -120,7 +120,7 @@
 }
 
 .image-dropzone-area:hover {
-  box-shadow: 0 0 11px rgba(33,33,33,.2); 
+  box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
 }
 
 .image-dropzone-area p {
@@ -169,4 +169,13 @@
 
 .centered {
   text-align: center;
+}
+
+.user-data-container {
+  padding-left: 10px;
+}
+
+.user-data > h2 {
+  font-size: 18px;
+  font-weight: normal;
 }
