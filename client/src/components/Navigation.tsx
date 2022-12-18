@@ -46,33 +46,38 @@ const Navigation = () => {
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             <Stack direction="row" justifyContent="flex-start">
-              <Link className="link" to="/">
-                <Button
-                  variant="contained"
-                  startIcon={<DeckIcon />}
-                  disableElevation
-                  sx={{
-                    display: { xs: "none", md: "flex" },
-                    fontWeight: 700,
-                    letterSpacing: ".2rem",
-                    color: "white",
-                    textDecoration: "none",
-                  }}
-                >
-                  {" "}
-                  GroundBnB
-                </Button>
-              </Link>
-              <Link className="link" to="/search">
-                <Button variant="contained" disableElevation>
-                  Search
-                </Button>
-              </Link>
-              <Link className="link" to="/create-listing">
-                <Button variant="contained" disableElevation>
-                  Create Listing
-                </Button>
-              </Link>
+              <Button
+                variant="contained"
+                startIcon={<DeckIcon />}
+                disableElevation
+                sx={{
+                  display: { xs: "none", md: "flex" },
+                  fontWeight: 700,
+                  letterSpacing: ".2rem",
+                  color: "white",
+                  textDecoration: "none",
+                }}
+                component={Link}
+                to={"/"}
+              >
+                GroundBnB
+              </Button>
+              <Button
+                variant="contained"
+                disableElevation
+                component={Link}
+                to={"/search"}
+              >
+                Search
+              </Button>
+              <Button
+                variant="contained"
+                disableElevation
+                component={Link}
+                to={"/create-listing"}
+              >
+                Create Listing
+              </Button>
             </Stack>
             <Stack direction="row" spacing={0} justifyContent="flex-end">
               {currentUser ? (
@@ -122,16 +127,22 @@ const Navigation = () => {
                 </div>
               ) : (
                 <div>
-                  <Link className="link" to="/signin">
-                    <Button variant="contained" disableElevation>
-                      Log In
-                    </Button>
-                  </Link>
-                  <Link className="link" to="/signup">
-                    <Button variant="contained" disableElevation>
-                      Sign Up
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    component={Link}
+                    to={"/signin"}
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    component={Link}
+                    to={"/signup"}
+                  >
+                    Sign Up
+                  </Button>
                 </div>
               )}
             </Stack>
