@@ -290,7 +290,7 @@ export default function EditListing() {
           'content-type': 'multipart/form-data'
       }
     }
-    const serverReponse = await axios.post('http://localhost:4000/listings/create', {
+    const serverReponse = await axios.put(`http://localhost:4000/listings/edit/${listingId}`, {
       description: description,
       price: price,
       street: data.result.address.postalAddress.addressLines[0],
@@ -338,7 +338,7 @@ export default function EditListing() {
       <Typography className='page-heading' variant='h4' component='div'>Edit Listing</Typography>
       <br />
       <form
-        id='create-listing-form'
+        id='edit-listing-form'
         onSubmit={async (e) => {
           e.preventDefault();
           setLoading(true);
