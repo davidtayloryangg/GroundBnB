@@ -466,12 +466,12 @@ export default function CreateListing() {
         </Stack>
       </form>
       <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}} action={viewListing}>
-        <Alert onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
+        <Alert variant='filled' onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
           Listing had been created!
         </Alert>
       </Snackbar>
       <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}>
-        <Alert onClose={handleErrorSnackClose} severity="error" sx={{ width: '100%' }}>
+        <Alert variant='filled' onClose={handleErrorSnackClose} severity="error" sx={{ width: '100%' }}>
           {addressError}
         </Alert>
       </Snackbar>
