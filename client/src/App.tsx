@@ -13,9 +13,10 @@ import Navigation from "./components/Navigation";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import PageNotFound from "./components/PageNotFound";
-import SingleListing from "./components/SingleListing";
-import Search from "./components/Search";
-import CreateListing from "./components/CreateListing";
+import SingleListing from './components/SingleListing';
+import Search from './components/Search';
+import CreateListing from './components/CreateListing';
+import EditListing from "./components/EditListing";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/listings/page/:pagenum" element={<Home />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path='/edit-listing/:listingId' element={<EditListing />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="*" element={<PageNotFound />} />

@@ -7,7 +7,7 @@ import { AuthContext } from '../firebase/Auth';
 import parse from 'autosuggest-highlight/parse';
 import * as _ from 'lodash';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const PLACESTYPES = ['premise', 'street_address'];
@@ -41,10 +41,14 @@ interface PlaceType {
   types: Array<string>;
 }
 
-export default function CreateListing() {
+export default function EditListing() {
+  const { listingId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
+  const [pageLoad, setPageLoad] = useState(false);
+  const [pageError, setPageError] = useState(false);
+  const [pageErrorMessage, setPageErrorMessage] = useState('');
   const [value, setValue] = React.useState<PlaceType | null>(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState<readonly PlaceType[]>([]);
@@ -75,13 +79,44 @@ export default function CreateListing() {
   const [openErrorSnack, setOpenErrorSnack] = useState(false);
   const [addressError, setAddressError] = useState('');
 
-  const [listingId, setListingId] = useState('');
-
   useEffect(() => {
     if (!currentUser) {
       navigate('/signin');
     }
   }, [navigate, currentUser]); 
+
+  useEffect(() => {
+    async function getListing() {
+      try {
+        setPageLoad(true);
+        setPageError(false);
+        const { data } = await axios.get(`http://localhost:4000/listings/${listingId}`);
+        console.log(data);
+        if (data.ownerId !== currentUser.uid) throw '403 - Access is Forbidden';
+        setStreet(data.address.street);
+        setCity(data.address.city);
+        setState(data.address.state);
+        setZipcode(data.address.zipcode);
+        setDescription(data.description);
+        setPrice(data.price.toString());
+        setFiles(data.imageUrls);
+      } catch (e: any) {
+        console.log(e);
+        setPageError(true);
+        if (typeof e === 'string') {
+          setPageErrorMessage(e);
+        }
+        else if (e.response.data.message && e.response.status) {
+          setPageErrorMessage(`${e.response.status} - ${e.response.data.message}`);
+        }
+        else {
+          setPageErrorMessage('An error occurred');
+        }
+      }
+      setPageLoad(false);
+    }
+    getListing();
+  }, [ listingId ])
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -158,7 +193,7 @@ export default function CreateListing() {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetchAddresses, autocompleteService.current]);
+  }, [value, inputValue, fetch, autocompleteService.current]);
 
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);
@@ -218,14 +253,10 @@ export default function CreateListing() {
       errors = true;
       setPriceError(true);
     }
-    if (acceptedFiles.length === 0) {
-      errors = true;
-      setImageError(true);
-    }
     return errors
   };
 
-  const createListing = async (description: String, price: String, street: String, city: String, state: String, zipcode: String, imageArray: Array<File>) => {
+  const editListing = async (description: String, price: String, street: String, city: String, state: String, zipcode: String, imageArray: Array<File>) => {
     // Validate address
     console.log('validating addresss')
     const { data } = await axios.post(`https://addressvalidation.googleapis.com/v1:validateAddress?key=${GOOGLE_MAPS_API_KEY}`, {
@@ -249,7 +280,7 @@ export default function CreateListing() {
           'content-type': 'multipart/form-data'
       }
     }
-    const serverReponse = await axios.post('http://localhost:4000/listings/create', {
+    const serverReponse = await axios.put(`http://localhost:4000/listings/edit/${listingId}`, {
       description: description,
       price: price,
       street: data.result.address.postalAddress.addressLines[0],
@@ -268,7 +299,7 @@ export default function CreateListing() {
   const thumbs = files.map((file, index) => (
     <Grid item xs={6} sm={4} md={3} key={index}>
       <img
-        src={file.preview}
+        src={file.preview ? file.preview : file}
         alt={`thumbnail-${index}`}
         width={'100px'}
         height={'100px'}
@@ -284,13 +315,29 @@ export default function CreateListing() {
     </Link>
   );
 
+  if (pageLoad) {
+    return (
+      <div>
+        <Typography className='page-heading' variant='h4' component='div'>Loading...</Typography>
+      </div>
+    )
+  }
+
+  if (pageError) {
+    return (
+      <div>
+        <Typography className='page-heading' variant='h4' component='div'>{pageErrorMessage}</Typography>
+      </div>
+    )
+  }
+
   return (
     <div>
       <br />
-      <Typography className='page-heading' variant='h4' component='div'>Create Listing</Typography>
+      <Typography className='page-heading' variant='h4' component='div'>Edit Listing</Typography>
       <br />
       <form
-        id='create-listing-form'
+        id='edit-listing-form'
         onSubmit={async (e) => {
           e.preventDefault();
           setLoading(true);
@@ -305,9 +352,8 @@ export default function CreateListing() {
           const errors = checkForErrors();
           if (!errors) {
             try {
-              const response = await createListing(description, price, street, city, state, zipcode, acceptedFiles);
+              const response = await editListing(description, price, street, city, state, zipcode, acceptedFiles);
               if (response) {
-                setListingId(response.data.listing.listingId);
                 setOpenSuccessSnack(true);
               }
             } catch (e: any) {
@@ -468,7 +514,7 @@ export default function CreateListing() {
       </form>
       <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}} action={viewListing}>
         <Alert variant='filled' onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
-          Listing had been created!
+          Listing had been edited!
         </Alert>
       </Snackbar>
       <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}>

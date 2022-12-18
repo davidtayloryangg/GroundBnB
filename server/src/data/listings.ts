@@ -175,50 +175,65 @@ export const editListing = async (listingId: string, description: String, price:
     if (doc.id !== listingId) throw "Listing address already exists";
   });
 
-  // delete current images
-  for (let i = 0; i < listingData.imageUrls.length; i++) {
-    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
-    deleteObject(storageRef)
-      .then(() => console.log('Image deleted'))
-      .catch((e) => console.log(e));
+  // handle images if new images are submitted
+  if (imageArray.length > 0) {
+    for (let i = 0; i < listingData.imageUrls.length; i++) {
+      const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+      deleteObject(storageRef)
+        .then(() => console.log('Image deleted'))
+        .catch((e) => console.log(e));
+    }
+
+    let imageUrls = [];
+    for (let i = 0; i < imageArray.length; i++) {
+      const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
+      await cropImage(imageArray[i]);
+
+      const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
+      const fileToUpload = fs
+        .readFileSync(path.resolve(__dirname, fileToUploadPath))
+        .toString("base64");
+
+      await uploadString(storageRef, fileToUpload, "base64")
+        .then(async (snapshot) => {
+          console.log("File uploaded!");
+          await getDownloadURL(
+            ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
+          ).then((url) => imageUrls.push(url));
+        })
+        .catch((e) => console.log(e));
+      fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
+      fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
+    }
+
+    // update document
+    await firestore.updateDoc(doc(db, "listings", listingId), {
+      description: description,
+      price: parseFloat(price.toFixed(2)),
+      address: {
+        street: street,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        geolocation: geolocation,
+      },
+      imageUrls: imageUrls,
+    });
   }
-
-  // uploading images
-  let imageUrls = [];
-  for (let i = 0; i < imageArray.length; i++) {
-    const storageRef = ref(storage, `${ownerId}/${listingId}-${i}.jpg`);
-    await cropImage(imageArray[i]);
-
-    const fileToUploadPath = `../../uploads-imagemagick/${imageArray[i].filename}.jpg`;
-    const fileToUpload = fs
-      .readFileSync(path.resolve(__dirname, fileToUploadPath))
-      .toString("base64");
-
-    await uploadString(storageRef, fileToUpload, "base64")
-      .then(async (snapshot) => {
-        console.log("File uploaded!");
-        await getDownloadURL(
-          ref(storage, `${ownerId}/${listingId}-${i}.jpg`)
-        ).then((url) => imageUrls.push(url));
-      })
-      .catch((e) => console.log(e));
-    fs.unlinkSync(path.resolve(__dirname, '../../' + imageArray[i].path));
-    fs.unlinkSync(path.resolve(__dirname, fileToUploadPath));
+  else {
+    await firestore.updateDoc(doc(db, "listings", listingId), {
+      description: description,
+      price: parseFloat(price.toFixed(2)),
+      address: {
+        street: street,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        geolocation: geolocation,
+      }
+    });
   }
-
-  // update document
-  await firestore.updateDoc(doc(db, "listings", listingId), {
-    description: description,
-    price: parseFloat(price.toFixed(2)),
-    address: {
-      street: street,
-      city: city,
-      state: state,
-      zipcode: zipcode,
-      geolocation: geolocation,
-    },
-    imageUrls: imageUrls,
-  });
+  
 
   return listingId;
 }

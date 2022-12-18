@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import * as firestore from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
@@ -466,16 +466,11 @@ function SingleListing() {
               >
                 {currentUser !== null &&
                 listingData.ownerId === currentUser.uid ? (
-                  <Button
-                    aria-label="edit listing"
-                    variant="contained"
-                    color="warning"
-                    onClick={(e) =>
-                      navigate(`/listings/edit/${listingIdValue}`)
-                    }
-                  >
-                    Edit this listing
-                  </Button>
+                  <Link className='link' to={`/edit-listing/${listingIdValue}`}>
+                      <Button aria-label="edit listing" variant='contained' color='warning'>
+                          Edit this listing
+                      </Button>
+                  </Link>
                 ) : (
                   <Button
                     aria-label="book listing"
