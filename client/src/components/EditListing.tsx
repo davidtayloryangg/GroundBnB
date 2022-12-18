@@ -300,6 +300,7 @@ export default function EditListing() {
     <Grid item xs={3} key={index}>
       <img
         src={file.preview ? file.preview : file}
+        alt={`thumbnail-${index}`}
         width={'100px'}
         height={'100px'}
         // Revoke data uri after image is loaded

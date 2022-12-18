@@ -269,6 +269,7 @@ export default function CreateListing() {
     <Grid item xs={3} key={index}>
       <img
         src={file.preview}
+        alt={`thumbnail-${index}`}
         width={'100px'}
         height={'100px'}
         // Revoke data uri after image is loaded
