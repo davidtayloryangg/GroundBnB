@@ -99,18 +99,7 @@ export default function EditListing() {
         setZipcode(data.address.zipcode);
         setDescription(data.description);
         setPrice(data.price.toString());
-        for (let i = 0; i < data.imageUrls.length; i++) {
-          // const config = {
-          //   headers: {
-          //     "Access-Control-Allow-Origin": "*"
-          //   }
-          // }
-          // const image = await axios.get(data.imageUrls[i]);
-          // console.log(image);
-
-          // const image = await fetch(data.imageUrls[i]);
-          // console.log(image);
-        }
+        setFiles(data.imageUrls);
       } catch (e: any) {
         console.log(e);
         setPageError(true);
@@ -314,7 +303,7 @@ export default function EditListing() {
   const thumbs = files.map((file, index) => (
     <Grid item xs={3} key={index}>
       <img
-        src={file.preview}
+        src={file.preview ? file.preview : file}
         width={'100px'}
         height={'100px'}
         // Revoke data uri after image is loaded
