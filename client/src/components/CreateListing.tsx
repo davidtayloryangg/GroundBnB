@@ -90,7 +90,7 @@ export default function CreateListing() {
     loaded.current = true;
   }
 
-  const fetch = useMemo(
+  const fetchAddresses = useMemo(
     () =>
       _.throttle(
         (
@@ -133,7 +133,7 @@ export default function CreateListing() {
     }
 
     if (/^\d+$/.test(inputValue.charAt(0))) {
-      fetch({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
+      fetchAddresses({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
         if (active) {
           let newOptions: readonly PlaceType[] = [];
   
@@ -153,7 +153,7 @@ export default function CreateListing() {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetch]);
+  }, [value, inputValue, fetchAddresses]);
 
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);

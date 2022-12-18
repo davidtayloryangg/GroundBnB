@@ -94,6 +94,18 @@ export default function EditListing() {
         setZipcode(data.address.zipcode);
         setDescription(data.description);
         setPrice(data.price.toString());
+        for (let i = 0; i < data.imageUrls.length; i++) {
+          // const config = {
+          //   headers: {
+          //     "Access-Control-Allow-Origin": "*"
+          //   }
+          // }
+          // const image = await axios.get(data.imageUrls[i]);
+          // console.log(image);
+
+          // const image = await fetch(data.imageUrls[i]);
+          // console.log(image);
+        }
       } catch (e: any) {
         console.log(e);
         setPageError(true);
@@ -124,7 +136,7 @@ export default function EditListing() {
     loaded.current = true;
   }
 
-  const fetch = useMemo(
+  const fetchAddresses = useMemo(
     () =>
       _.throttle(
         (
@@ -167,7 +179,7 @@ export default function EditListing() {
     }
 
     if (/^\d+$/.test(inputValue.charAt(0))) {
-      fetch({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
+      fetchAddresses({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
         if (active) {
           let newOptions: readonly PlaceType[] = [];
   
