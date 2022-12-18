@@ -1,12 +1,20 @@
-import firebase from 'firebase/compat/app';
-import axios from 'axios';
+import firebase from "firebase/compat/app";
+import axios from "axios";
 
-async function doCreateUserWithEmailAndPassword(email: string, password: string, displayName: any) {
+async function doCreateUserWithEmailAndPassword(
+  email: string,
+  password: string,
+  displayName: any
+) {
   await firebase.auth().createUserWithEmailAndPassword(email, password);
-  firebase.auth().currentUser.updateProfile({ displayName: displayName });
+  await firebase.auth().currentUser.updateProfile({ displayName: displayName });
 }
 
-async function doChangePassword(email: any, oldPassword: any, newPassword: string) {
+async function doChangePassword(
+  email: any,
+  oldPassword: any,
+  newPassword: string
+) {
   let credential = firebase.auth.EmailAuthProvider.credential(
     email,
     oldPassword
@@ -22,7 +30,7 @@ async function doSignInWithEmailAndPassword(email: string, password: string) {
 
 async function doSocialSignIn(provider: string) {
   let socialProvider: any = null;
-  if (provider === 'google') {
+  if (provider === "google") {
     socialProvider = new firebase.auth.GoogleAuthProvider();
   }
   await firebase.auth().signInWithPopup(socialProvider);
@@ -31,22 +39,26 @@ async function doSocialSignIn(provider: string) {
 async function doSocialSignUp(provider: string) {
   await doSocialSignIn(provider);
 
-  await axios.post('http://localhost:4000/users/signup', {
+  await axios.post("http://localhost:4000/users/signup", {
     userId: firebase.auth().currentUser.uid,
     email: firebase.auth().currentUser.email,
-    firstName: firebase.auth().currentUser.displayName.split(' ')[0],
-    lastName: firebase.auth().currentUser.displayName.split(' ')[1],
+    firstName: firebase.auth().currentUser.displayName.split(" ")[0],
+    lastName: firebase.auth().currentUser.displayName.split(" ")[1],
   });
 }
 
-async function doSignUpWithEmailAndPassword(email: string, password: string, displayName: string) {
+async function doSignUpWithEmailAndPassword(
+  email: string,
+  password: string,
+  displayName: string
+) {
   await doCreateUserWithEmailAndPassword(email, password, displayName);
 
-  await axios.post('http://localhost:4000/users/signup', {
+  await axios.post("http://localhost:4000/users/signup", {
     userId: firebase.auth().currentUser.uid,
     email: email,
-    firstName: displayName.split(' ')[0],
-    lastName: displayName.split(' ')[1],
+    firstName: displayName.split(" ")[0],
+    lastName: displayName.split(" ")[1],
   });
 }
 
@@ -71,5 +83,5 @@ export {
   doPasswordReset,
   doPasswordUpdate,
   doSignOut,
-  doChangePassword
+  doChangePassword,
 };

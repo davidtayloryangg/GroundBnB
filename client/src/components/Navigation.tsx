@@ -1,13 +1,44 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
 import { doSignOut } from "../firebase/FirebaseFunctions";
-import { AppBar, Button, Container, Stack, Toolbar } from "@mui/material";
+import {
+  AppBar,
+  Button,
+  Container,
+  Stack,
+  Toolbar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import DeckIcon from "@mui/icons-material/Deck";
 import "../App.css";
 
 const Navigation = () => {
   const { currentUser } = useContext(AuthContext);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+
+  const handleMenu = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMyProfilePressed = () => {
+    setAnchorEl(null);
+    navigate("/my-profile");
+  };
+
+  const handleSignOutPressed = () => {
+    setAnchorEl(null);
+    doSignOut();
+  };
 
   return (
     <div className="App">
@@ -32,37 +63,68 @@ const Navigation = () => {
                   GroundBnB
                 </Button>
               </Link>
-              <Link className="link" to="/listings/page/1">
+              <Link className="link" to="/search">
                 <Button variant="contained" disableElevation>
-                  Listings
+                  Search
                 </Button>
-              </Link>
-              <Link className='link' to='/search'>
-                <Button variant='contained' disableElevation>Search</Button>
               </Link>
               <Link className="link" to="/bookings">
                 <Button variant="contained" disableElevation>
                   Bookings
                 </Button>
               </Link>
-              <Link className="link" to="/my-profile">
+              <Link className="link" to="/create-listing">
                 <Button variant="contained" disableElevation>
-                  My Profile
+                  Create Listing
                 </Button>
-              </Link>
-              <Link className='link' to='/create-listing'>
-                  <Button variant='contained' disableElevation>Create Listing</Button>
               </Link>
             </Stack>
             <Stack direction="row" spacing={0} justifyContent="flex-end">
               {currentUser ? (
-                <Button
-                  variant="contained"
-                  disableElevation
-                  onClick={doSignOut}
-                >
-                  Sign Out
-                </Button>
+                <div>
+                  <Button
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="menu-appbar"
+                    aria-haspopup="true"
+                    onClick={handleMenu}
+                    color="inherit"
+                  >
+                    <Stack direction="row" spacing={1}>
+                      <AccountCircle />
+                      <Typography
+                        sx={{
+                          fontSize: "15px",
+                          fontWeight: "bold",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {currentUser.displayName}
+                      </Typography>
+                    </Stack>
+                  </Button>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleMyProfilePressed}>
+                      Profile
+                    </MenuItem>
+                    <MenuItem onClick={handleSignOutPressed}>Sign Out</MenuItem>
+                  </Menu>
+                </div>
               ) : (
                 <div>
                   <Link className="link" to="/signin">

@@ -11,14 +11,52 @@ bookingRoutes.post(
   async (req: Request, res: Response) => {
     console.log("POST /bookings/:bookingId/cancel");
     const bookingId = req.params.bookingId;
+    const userId = new xss.FilterXSS().process(req.body.userId).trim();
 
     const booking = await bookingsData.getBooking(bookingId);
     if (booking === null) {
-      res.status(404).json({ message: "Booking not found" });
+      res.status(404).json({ message: "Cancel failed: Booking not found" });
       return;
     }
+
+    try {
+      await validation.validUID(userId);
+    } catch (e) {
+      res.status(400).json({ message: "Cancel failed: Invalid UID" });
+      return;
+    }
+
+    if (booking.bookerId !== userId && booking.ownerId !== userId) {
+      res.status(400).json({
+        message: "Cancel failed: Not authorized to cancel this booking",
+      });
+      return;
+    }
+
+    const formatDate = new Date(
+      booking.startTimestamp.seconds * 1000 +
+        booking.startTimestamp.nanoseconds / 1000000
+    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let latestCancelDate = new Date();
+    latestCancelDate.setDate(formatDate.getDate() - 2);
+    if (formatDate < today) {
+      res
+        .status(400)
+        .json({ message: "Cancel failed: Booking already passed" });
+      return;
+    } else if (latestCancelDate < today) {
+      res
+        .status(400)
+        .json({ message: "Cancel failed: Too late to cancel booking" });
+      return;
+    }
+
     if (booking.status === "CANCELED") {
-      res.status(400).json({ message: "Booking already canceled" });
+      res
+        .status(400)
+        .json({ message: "Cancel failed: Booking already canceled" });
       return;
     }
 

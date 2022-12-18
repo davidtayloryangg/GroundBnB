@@ -32,4 +32,21 @@ declare global {
     imageUrls: string[];
     description: string;
   };
+
+  type timestamp = {
+    seconds: number;
+    nanoseconds: number;
+  };
+
+  type Booking = {
+    totalPrice: number;
+    status: string;
+    ownerId: string;
+    numOfPeople: number;
+    bookingId: string;
+    listingId: string;
+    bookerId: string;
+    startTimestamp: timestamp;
+    endTimestamp: timestamp;
+  };
 }
