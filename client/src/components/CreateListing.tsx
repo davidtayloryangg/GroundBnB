@@ -158,7 +158,7 @@ export default function CreateListing() {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetchAddresses]);
+  }, [value, inputValue, fetchAddresses, autocompleteService.current]);
 
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);

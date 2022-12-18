@@ -193,7 +193,7 @@ export default function EditListing() {
     return () => {
       active = false;
     };
-  }, [value, inputValue, fetch]);
+  }, [value, inputValue, fetch, autocompleteService.current]);
 
   const handleStreetChange = (e: any) => {
     setStreet(e.target.value);
