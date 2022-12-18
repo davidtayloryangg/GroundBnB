@@ -1,8 +1,6 @@
 # dependencies
 **/node_modules
 **/package-lock.json
-**/uploads
-**/uploads-imagemagick
 **/.env
 **/.vscode
 /.pnp
