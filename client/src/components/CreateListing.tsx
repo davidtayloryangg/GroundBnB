@@ -50,13 +50,18 @@ export default function CreateListing() {
   const [options, setOptions] = React.useState<readonly PlaceType[]>([]);
   const loaded = React.useRef(false);
 
+  const [files, setFiles] = useState([]);
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: { 'image/jpeg': ['.jpeg', '.jpg'] } });
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: { 'image/jpeg': ['.jpeg', '.jpg'] }, onDrop: acceptedFiles => {
+    setFiles(acceptedFiles.map(file => Object.assign(file, {
+      preview: URL.createObjectURL(file)
+    })));
+  } });
 
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
@@ -260,9 +265,17 @@ export default function CreateListing() {
     return serverReponse;
   }
 
-  const imagesList = acceptedFiles.map((file, index) => {
-    return <li key={index}>{file.name}</li>
-  });
+  const thumbs = files.map((file, index) => (
+    <Grid item xs={3} key={index}>
+      <img
+        src={file.preview}
+        width={'100px'}
+        height={'100px'}
+        // Revoke data uri after image is loaded
+        onLoad={() => { URL.revokeObjectURL(file.preview) }}
+      />
+    </Grid>
+  ));
 
   const viewListing = (
     <Link className='link' to={`/listings/${listingId}`}>
@@ -313,17 +326,16 @@ export default function CreateListing() {
           setLoading(false);
         }}>
         <Stack direction='row' spacing={1} justifyContent='space-evenly'>
-          <Stack direction='column'>
+          <Stack direction='column' sx={{width: '450px'}}>
             <div className='image-dropzone-area' {...getRootProps({className: 'dropzone image-dropzone-area'})}>
               <input {...getInputProps()} />
               <p>Drag 'n' drop some images here, or click to select images</p>
             </div>
+            <br />
             <div>
-              <p className='error'>{imageError ? 'Must select at least one image' : ''}</p>
-              <p>Files:</p>
-              <ul>
-                {imagesList}
-              </ul>
+              <Grid container spacing={1} flexGrow={1} flexDirection='row' alignItems='center'>
+                {thumbs}
+              </Grid>
             </div>
           </Stack>
           <Stack direction='column' spacing={2}>
