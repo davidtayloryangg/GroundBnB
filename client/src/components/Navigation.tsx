@@ -68,11 +68,6 @@ const Navigation = () => {
                   Search
                 </Button>
               </Link>
-              <Link className="link" to="/bookings">
-                <Button variant="contained" disableElevation>
-                  Bookings
-                </Button>
-              </Link>
               <Link className="link" to="/create-listing">
                 <Button variant="contained" disableElevation>
                   Create Listing
