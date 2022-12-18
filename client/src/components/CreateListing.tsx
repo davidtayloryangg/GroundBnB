@@ -337,6 +337,7 @@ export default function CreateListing() {
                 {thumbs}
               </Grid>
             </div>
+            <p className='error'>{imageError ? 'Must select at least one image' : ''}</p>
           </Stack>
           <Stack direction='column' spacing={2}>
           <Autocomplete
