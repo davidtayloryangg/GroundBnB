@@ -282,6 +282,7 @@ bookingRoutes.post("/create", async (req: Request, res: Response) => {
     numOfPeople,
     listingFound.ownerId,
     listingFound.price * (diffInDays + 1),
+    listingFound.numOfBookings,
     endDateJustDate.toString(),
     startDateJustDate.toString()
   );

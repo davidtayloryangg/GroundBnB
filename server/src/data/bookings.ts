@@ -23,7 +23,7 @@ export const getBookingsByListingId = async (listingId : string, excludeCanceled
                   firestore.query(collection, firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE')) : 
                   firestore.query(collection, firestore.where('listingId', '==', listingId));
   const bookingsForListing = await firestore.getDocs(query);
-  const bookingsFoundForListing = []
+  const bookingsFoundForListing = [];
 
   if(!bookingsForListing.empty) {
     bookingsForListing.forEach((booking) => {
@@ -73,7 +73,7 @@ export const getAllBookings = async () => {
   });
 };
 
-export const createBooking = async (bookerId : string, listingId : string, numOfPeople : number, ownerId : string, totalPrice : number, endTimestamp : string, startTimestamp : string) => {
+export const createBooking = async (bookerId : string, listingId : string, numOfPeople : number, ownerId : string, totalPrice : number, numOfBookings : number,endTimestamp : string, startTimestamp : string) => {
   const booking = {
     bookerId : bookerId,
     endTimestamp : Timestamp.fromDate(new Date(endTimestamp)),
@@ -86,6 +86,10 @@ export const createBooking = async (bookerId : string, listingId : string, numOf
     bookingId : null
   };
 
+  await firestore.updateDoc(doc(db, "listings", listingId), {
+    numOfBookings : numOfBookings + 1
+  }); 
+
   const bookingAdded = await firestore.addDoc(collection, booking);
   await firestore.updateDoc(doc(db, "bookings", bookingAdded.id), {
     bookingId : bookingAdded.id
@@ -93,4 +97,18 @@ export const createBooking = async (bookerId : string, listingId : string, numOf
 
   booking.bookingId = bookingAdded.id;
   return booking;
+};
+
+export const getUserBookingsForGivenListingId = async (bookerId : string, listingId : string) => {
+  const  query = firestore.query(collection, firestore.where('bookerId', '==', bookerId), firestore.where('listingId', '==', listingId), firestore.where('status', '==', 'ACTIVE'));
+  const bookingsByUserForGivenListing = await firestore.getDocs(query);
+  const bookingsByUserForGivenListingFound = [];
+
+  if (!bookingsByUserForGivenListing.empty) {
+    bookingsByUserForGivenListing.forEach((booking) => {
+      bookingsByUserForGivenListingFound.push(booking.data());
+    });
+  }
+
+  return bookingsByUserForGivenListingFound;
 };

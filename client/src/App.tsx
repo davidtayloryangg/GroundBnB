@@ -12,6 +12,7 @@ import SignUp from "./components/SignUp";
 import Landing from "./components/Landing";
 import SignOut from "./components/SignOut";
 import PageNotFound from "./components/PageNotFound";
+import SingleListing from './components/SingleListing';
 import Search from './components/Search';
 import CreateListing from './components/CreateListing';
 
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signout" element={<SignOut />} />
             <Route path="*" element={<PageNotFound />} />
+            <Route path="/listing/:listingId" element={<SingleListing />}/>
             <Route path="/search" element={<Search />} />
           </Routes>
         </div>
