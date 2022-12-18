@@ -1,8 +1,10 @@
 # dependencies
 **/node_modules
 **/package-lock.json
-**/uploads
-**/uploads-imagemagick
+server/uploads/*
+server/uploads-imagemagick/*
+!uploads/.gitkeep
+!uploads-imagemagick/.gitkeep
 **/.env
 **/.vscode
 /.pnp
