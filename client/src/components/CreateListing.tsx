@@ -266,7 +266,7 @@ export default function CreateListing() {
   }
 
   const thumbs = files.map((file, index) => (
-    <Grid item xs={3} key={index}>
+    <Grid item xs={6} sm={4} md={3} key={index}>
       <img
         src={file.preview}
         alt={`thumbnail-${index}`}
