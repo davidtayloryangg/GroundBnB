@@ -45,9 +45,8 @@ Customers who have GroundBnB accounts are able to browse backyards to rent while
     cd client
     npm i
 5. Start server & client (Locally)
-    ```sh
-    npm start
-    ```
+    * Server: `npm run dev`
+    * Client: `npm start`
 # <a name="test-accounts"></a> Test Accounts
 Use the following account to test our application, or simply create a new account!
 * Email: test@test.com
