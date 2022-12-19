@@ -190,7 +190,7 @@ function SingleListing() {
                   `http://localhost:4000/users/${review.userId}`
                 );
                 fullName = `${data.firstName} ${data.lastName}`;
-              } catch (e) {}
+              } catch (e) { }
 
               reviewsArr.push({
                 user: fullName,
@@ -212,7 +212,7 @@ function SingleListing() {
               `http://localhost:4000/bookings/listing/${listingIdValue}?excludeCanceled=true`
             );
             setBookingsForListingData(data.data);
-          } catch (e) {}
+          } catch (e) { }
         }
       } catch (e) {
         if (axios.isAxiosError(e)) {
@@ -241,6 +241,10 @@ function SingleListing() {
       originalAlt: string;
       thumbnail: string;
       thumbnailAlt: string;
+      originalHeight?: number;
+      originalWidth?: number;
+      sizes?: string;
+      srcSet?: string;
     }[] = [];
     let reviewCards = reviews.map((review) => {
       return buildReviewCard(review);
@@ -252,6 +256,10 @@ function SingleListing() {
         originalAlt: image,
         thumbnail: image,
         thumbnailAlt: image,
+        originalHeight: 500,
+        originalWidth: 500,
+        sizes: "100vw",
+        srcSet: `${image} 500w`,
       });
     });
 
@@ -315,7 +323,7 @@ function SingleListing() {
               </CardMedia>
             </Card>
           </Grid>
-          <Grid item justifySelf="center" maxWidth="5" marginTop="25px">
+          <Grid item justifySelf="center" marginTop="25px">
             <Card
               sx={{
                 minWidth: 275,
@@ -340,7 +348,7 @@ function SingleListing() {
                 >
                   {numOfReviews} reviews
                 </Typography>
-                <Typography variant="body2" width="400">
+                <Typography variant="body2" width="400px">
                   {listingData.description}
                 </Typography>
               </CardContent>
@@ -465,12 +473,10 @@ function SingleListing() {
                 }}
               >
                 {currentUser !== null &&
-                listingData.ownerId === currentUser.uid ? (
-                  <Link className='link' to={`/edit-listing/${listingIdValue}`}>
-                      <Button aria-label="edit listing" variant='contained' color='warning'>
-                          Edit this listing
-                      </Button>
-                  </Link>
+                  listingData.ownerId === currentUser.uid ? (
+                  <Button aria-label="edit listing" variant='contained' color='warning' component={Link} to={`/edit-listing/${listingIdValue}`}>
+                    Edit this listing
+                  </Button>
                 ) : (
                   <Button
                     aria-label="book listing"
@@ -525,7 +531,7 @@ function SingleListing() {
                 </Typography>
               </Grid>
               {currentUser !== null &&
-              listingData.ownerId !== currentUser.uid ? (
+                listingData.ownerId !== currentUser.uid ? (
                 <Grid item sx={{ pb: 4 }}>
                   <Card sx={{ border: "none", boxShadow: "none" }}>
                     {reviewError ? (

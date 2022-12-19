@@ -61,11 +61,13 @@ export default function EditListing() {
   const [zipcode, setZipcode] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: { 'image/jpeg': ['.jpeg', '.jpg'] }, onDrop: acceptedFiles => {
-    setFiles(acceptedFiles.map(file => Object.assign(file, {
-      preview: URL.createObjectURL(file)
-    })));
-  } });
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    accept: { 'image/jpeg': ['.jpeg', '.jpg'] }, onDrop: acceptedFiles => {
+      setFiles(acceptedFiles.map(file => Object.assign(file, {
+        preview: URL.createObjectURL(file)
+      })));
+    }
+  });
 
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
@@ -83,7 +85,7 @@ export default function EditListing() {
     if (!currentUser) {
       navigate('/signin');
     }
-  }, [navigate, currentUser]); 
+  }, [navigate, currentUser]);
 
   useEffect(() => {
     async function getListing() {
@@ -116,7 +118,7 @@ export default function EditListing() {
       setPageLoad(false);
     }
     getListing();
-  }, [ listingId ])
+  }, [listingId])
 
   if (typeof window !== 'undefined' && !loaded.current) {
     if (!document.querySelector('#google-maps')) {
@@ -176,15 +178,15 @@ export default function EditListing() {
       fetchAddresses({ input: inputValue, types: PLACESTYPES }, (results?: readonly PlaceType[]) => {
         if (active) {
           let newOptions: readonly PlaceType[] = [];
-  
+
           if (value) {
             newOptions = [value];
           }
-  
+
           if (results) {
             newOptions = [...newOptions, ...results];
           }
-  
+
           setOptions(newOptions);
         }
       });
@@ -277,7 +279,7 @@ export default function EditListing() {
     // Need to call post route
     const config = {
       headers: {
-          'content-type': 'multipart/form-data'
+        'content-type': 'multipart/form-data'
       }
     }
     const serverReponse = await axios.put(`http://localhost:4000/listings/edit/${listingId}`, {
@@ -301,8 +303,8 @@ export default function EditListing() {
       <img
         src={file.preview ? file.preview : file}
         alt={`thumbnail-${index}`}
-        width={'100px'}
-        height={'100px'}
+        width={'100'}
+        height={'100'}
         // Revoke data uri after image is loaded
         onLoad={() => { URL.revokeObjectURL(file.preview) }}
       />
@@ -361,7 +363,7 @@ export default function EditListing() {
               if (typeof e === 'string') {
                 setAddressError(e);
               }
-              else if (e.response.data.message){
+              else if (e.response.data.message) {
                 setAddressError(e.response.data.message);
               }
               else {
@@ -373,8 +375,8 @@ export default function EditListing() {
           setLoading(false);
         }}>
         <Stack direction='row' spacing={1} justifyContent='space-evenly'>
-          <Stack direction='column' sx={{width: '450px'}}>
-            <div className='image-dropzone-area' {...getRootProps({className: 'dropzone image-dropzone-area'})}>
+          <Stack direction='column' sx={{ width: '450px' }}>
+            <div className='image-dropzone-area' {...getRootProps({ className: 'dropzone image-dropzone-area' })}>
               <input {...getInputProps()} />
               <p>Drag 'n' drop some images here, or click to select images</p>
             </div>
@@ -387,67 +389,67 @@ export default function EditListing() {
             <p className='error'>{imageError ? 'Must select at least one image' : ''}</p>
           </Stack>
           <Stack direction='column' spacing={2}>
-          <Autocomplete
-            id="google-map-demo"
-            size='small'
-            sx={{ width: 350 }}
-            getOptionLabel={(option) =>
-              typeof option === 'string' ? option : option.description
-            }
-            filterOptions={(x) => x}
-            options={options}
-            autoComplete
-            includeInputInList
-            filterSelectedOptions
-            // value={value}
-            onChange={(event: any, newValue: any | null) => {
-              setOptions(newValue ? [newValue, ...options] : options);
-              setValue(newValue);
-            }}
-            onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Add a location" fullWidth />
-            )}
-            renderOption={(props, option) => {
-              const matches = option.structured_formatting.main_text_matched_substrings;
-              const parts = parse(
-                option.structured_formatting.main_text,
-                matches.map((match: any) => [match.offset, match.offset + match.length]),
-              );
+            <Autocomplete
+              id="google-map-demo"
+              size='small'
+              sx={{ width: 350 }}
+              getOptionLabel={(option) =>
+                typeof option === 'string' ? option : option.description
+              }
+              filterOptions={(x) => x}
+              options={options}
+              autoComplete
+              includeInputInList
+              filterSelectedOptions
+              // value={value}
+              onChange={(event: any, newValue: any | null) => {
+                setOptions(newValue ? [newValue, ...options] : options);
+                setValue(newValue);
+              }}
+              onInputChange={(event, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Add a location" fullWidth />
+              )}
+              renderOption={(props, option) => {
+                const matches = option.structured_formatting.main_text_matched_substrings;
+                const parts = parse(
+                  option.structured_formatting.main_text,
+                  matches.map((match: any) => [match.offset, match.offset + match.length]),
+                );
 
-              return (
-                <li {...props}>
-                  <Grid container alignItems="center">
-                    <Grid item>
-                      <Box
-                        component={LocationOnIcon}
-                        sx={{ color: 'text.secondary', mr: 2 }}
-                      />
+                return (
+                  <li {...props}>
+                    <Grid container alignItems="center">
+                      <Grid item>
+                        <Box
+                          component={LocationOnIcon}
+                          sx={{ color: 'text.secondary', mr: 2 }}
+                        />
+                      </Grid>
+                      <Grid item xs>
+                        {parts.map((part: any, index: any) => (
+                          <span
+                            key={index}
+                            style={{
+                              fontWeight: part.highlight ? 700 : 400,
+                            }}
+                          >
+                            {part.text}
+                          </span>
+                        ))}
+                        <Typography variant="body2" color="text.secondary">
+                          {option.structured_formatting.secondary_text}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs>
-                      {parts.map((part: any, index: any) => (
-                        <span
-                          key={index}
-                          style={{
-                            fontWeight: part.highlight ? 700 : 400,
-                          }}
-                        >
-                          {part.text}
-                        </span>
-                      ))}
-                      <Typography variant="body2" color="text.secondary">
-                        {option.structured_formatting.secondary_text}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </li>
-              );
-            }}
-          />
+                  </li>
+                );
+              }}
+            />
 
-            <TextField variant='outlined' label='Street Address' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{width: '350px'}} />
+            <TextField variant='outlined' label='Street Address' id='street' name='street' value={street} onChange={handleStreetChange} size='small' error={streetError} helperText={streetError ? 'Invalid Input' : null} required fullWidth sx={{ width: '350px' }} />
             <TextField variant='outlined' label='City' id='city' name='city' value={city} onChange={handleCityChange} size='small' error={cityError} helperText={cityError ? 'Invalid Input' : null} required fullWidth />
             <TextField select variant='outlined' label='State' id='state' name='state' value={state} onChange={handleStateChange} size='small' error={stateError} helperText={stateError ? 'Invalid Input' : null} required fullWidth>
               <MenuItem value='AL'>AL</MenuItem>
@@ -509,15 +511,15 @@ export default function EditListing() {
         </Stack>
         <br />
         <Stack direction='row' alignItems='center' justifyContent='center'>
-          <LoadingButton variant='contained' type='submit' disableElevation sx={{width: '150px'}} loading={loading}>Save</LoadingButton>
+          <LoadingButton variant='contained' type='submit' disableElevation sx={{ width: '150px' }} loading={loading}>Save</LoadingButton>
         </Stack>
       </form>
-      <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}} action={viewListing}>
+      <Snackbar open={openSuccessSnack} autoHideDuration={5000} onClose={handleSuccessSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} action={viewListing}>
         <Alert variant='filled' onClose={handleSuccessSnackClose} severity="success" sx={{ width: '100%' }}>
           Listing had been edited!
         </Alert>
       </Snackbar>
-      <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}>
+      <Snackbar open={openErrorSnack} autoHideDuration={5000} onClose={handleErrorSnackClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert variant='filled' onClose={handleErrorSnackClose} severity="error" sx={{ width: '100%' }}>
           {addressError}
         </Alert>
