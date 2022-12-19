@@ -130,13 +130,14 @@ export default function CreateListing() {
         window as any
       ).google.maps.places.AutocompleteService();
     }
-    // if (!autocompleteService.current) {
-    //   return undefined;
-    // }
+
+    if (!autocompleteService.current) {
+      return undefined;
+    }
 
     if (inputValue === '') {
       setOptions(value ? [value] : []);
-      // return undefined;
+      return undefined;
     }
 
     if (/^\d+$/.test(inputValue.charAt(0))) {
