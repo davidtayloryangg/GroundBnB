@@ -23,7 +23,7 @@ function loadScript(src: string, position: HTMLElement | null, id: string) {
   script.src = src;
   position.appendChild(script);
 }
-const autocompleteService = { current: null as any };
+const autocompleteService = { current: '' as any };
 
 interface MainTextMatchedSubstrings {
   offset: number;
