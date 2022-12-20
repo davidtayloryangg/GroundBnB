@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useEffect, useContext, useRef } from 'react';
 import { Alert, Autocomplete, Box, Button, Grid, MenuItem, Snackbar, Stack, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -23,7 +23,7 @@ function loadScript(src: string, position: HTMLElement | null, id: string) {
   script.src = src;
   position.appendChild(script);
 }
-const autocompleteService = { current: null as any };
+const autocompleteService = { current: '' as any };
 
 interface MainTextMatchedSubstrings {
   offset: number;
@@ -45,10 +45,10 @@ export default function CreateListing() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
-  const [value, setValue] = React.useState<PlaceType | null>(null);
-  const [inputValue, setInputValue] = React.useState('');
-  const [options, setOptions] = React.useState<readonly PlaceType[]>([]);
-  const loaded = React.useRef(false);
+  const [value, setValue] = useState<PlaceType | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [options, setOptions] = useState<readonly PlaceType[]>([]);
+  const loaded = useRef(false);
 
   const [files, setFiles] = useState([]);
   const [street, setStreet] = useState('');
@@ -130,13 +130,14 @@ export default function CreateListing() {
         window as any
       ).google.maps.places.AutocompleteService();
     }
-    // if (!autocompleteService.current) {
-    //   return undefined;
-    // }
+
+    if (!autocompleteService.current) {
+      return undefined;
+    }
 
     if (inputValue === '') {
       setOptions(value ? [value] : []);
-      // return undefined;
+      return undefined;
     }
 
     if (/^\d+$/.test(inputValue.charAt(0))) {
