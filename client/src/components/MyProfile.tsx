@@ -86,6 +86,15 @@ function MyProfile() {
     return formatDate < today;
   }
 
+  function pastDate(date: timestamp): boolean {
+    const formatDate = new Date(
+      date.seconds * 1000 + date.nanoseconds / 1000000
+    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return formatDate < today;
+  }
+
   let bookingsFilterButtonStyle = {
     "&.MuiToggleButton-root.Mui-selected": {
       backgroundColor: "#1976D2",
@@ -198,7 +207,7 @@ function MyProfile() {
       case "past":
         userBookings = userBookings.filter(
           (userBooking: UserBooking) =>
-            canCancel(userBooking.booking.startTimestamp) === true
+            pastDate(userBooking.booking.endTimestamp) === true
         );
         currentFilterText = "Past";
         break;
