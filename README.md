@@ -3,9 +3,9 @@
 # Table of contents
 * [Project Overview](#project-overview)
 * [Getting Started](#getting-started)
+* [Test Accounts] (#test-accounts)
 * [Technologies](#technologies)
 * [Database](#database)
-* [Todo's](#todo)
 
 <!-- Project Overview -->
 # <a name="project-overview"></a>Project Overview
@@ -21,19 +21,36 @@ Customers who have GroundBnB accounts are able to browse backyards to rent while
     ```sh
     git clone https://github.com/davidtayloryangg/GroundBnB.git
     ```
-2. Install server dependencies 
+2. If not already installed on your machine, install the ImageMagick CLI tools. On Mac you can use the following command through Homebrew:
+    `brew install imagemagick`
+   Or you can install based on your machine here: [ImageMagick Downloads](https://imagemagick.org/script/download.php)
+   
+2. Add `.env` files to client and server folders. They should contain the following keys:
+    * REACT_APP_FIREBASE_KEY
+    * REACT_APP_FIREBASE_DOMAIN
+    * REACT_APP_FIREBASE_DATABASE
+    * REACT_APP_FIREBASE_PROJECT_ID
+    * REACT_APP_FIREBASE_STORAGE_BUCKET
+    * REACT_APP_FIREBASE_SENDER_ID
+    * REACT_APP_FIREBASE_APP_ID
+    * REACT_APP_FIREBASE_MEAS_ID
+    * REACT_APP_GOOGLE_MAPS_API_KEY
+3. Install server dependencies 
     ```sh
     cd server/
     npm i
     ```
-3. Install client dependencies
+4. Install client dependencies
     ```sh
     cd client
     npm i
-4. Start server & client (Locally)
-    ```sh
-    npm start
-    ```
+5. Start server & client (Locally)
+    * Server: `npm run dev`
+    * Client: `npm start`
+# <a name="test-accounts"></a> Test Accounts
+Use the following account to test our application, or simply create a new account!
+* Email: test@test.com
+* Password: 12345678
 
 # <a name="technologies"></a>Technologies
 * [React](https://reactjs.org/docs/getting-started.html)
@@ -43,18 +60,6 @@ Customers who have GroundBnB accounts are able to browse backyards to rent while
 * [ImageMagick](https://imagemagick.org/script/index.php)
 
 # <a name="database"></a>Database
+We are using various Firebase products to house our application's data, including Authentication, Firestore Database, and Storage. We invited Professor Hill using the phill@stevens.edu email.
 
-
-
-# <a name="todo"></a>Todo's
-- [ ] validations.ts David
-- [ ] routes/listings-(/all) Ronnie
-- [ ] routes/listings-(/search/location) David
-- [ ] routes/listings-(/create) & (edit/:listingId) Leena
-- [ ] routes/listings-(/:listingId') & 
-- [ ] ('/:listingId/review') Matt 
-- [ ] routes/bookings-(/all') & ('/create') Caroline
-- [ ] ('/cancel/:bookingId) Matt
-
-
-
+Here is this link to our project: [GroundBnB](https://console.firebase.google.com/u/2/project/groundbnb-c4531/overview). 
